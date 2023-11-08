@@ -25,3 +25,29 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+
+@font-face {
+  font-family: 'Mark';
+  src: local('Mark-Bold'),
+      url('/Mark-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mark';
+  src: local('Mark-Book'),
+      url('/Mark-Book.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NeoSans';
+  src: local('NeoSans'),
+      url('/NeoSans-Bold.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+

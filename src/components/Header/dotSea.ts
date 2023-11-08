@@ -88,6 +88,34 @@ export const createDotSea = (option: {
 
   setWidth(meta.width);
 
+  const toScreenPosition = (vec: Three.Vector3) => {
+    const { x, y, z } = vec;
+    const vector = new Three.Vector3(x, y, z);
+    const canvas = renderer.domElement;
+
+    // map to normalized device coordinate (NDC) space
+    vector.project(camera);
+
+    // map to 2D screen space
+    return {
+      x: Math.round((vector.x + 1) * (canvas.width / 2)),
+      y: Math.round((-vector.y + 1) * (canvas.height / 2)),
+    };
+  };
+
+  const getCurve = () => {
+    const curveArray: [number, number][] = [];
+    for (let ix = 0; ix < meta.amountX; ix += 1) {
+      const curveParticle = particles[ix * meta.amountY + (meta.amountY - 3)];
+      const { x, y } = toScreenPosition(curveParticle.position);
+      curveArray.push([
+        x / window.devicePixelRatio,
+        y / window.devicePixelRatio,
+      ]);
+    }
+    return curveArray;
+  };
+
   let tick = 0;
 
   const render = () => {
@@ -116,20 +144,30 @@ export const createDotSea = (option: {
 
   let requestId: number;
 
+  const callbacks: Function[] = [];
+
   const animate = () => {
     render();
+    callbacks.every((callback) => callback());
     requestId = requestAnimationFrame(animate);
   };
 
   animate();
 
+  const onUpdate = (callback: Function) => {
+    callbacks.push(callback);
+  };
+
   return {
     renderer,
     setColor,
     destroy: () => {
+      callbacks.length = 0;
       cancelAnimationFrame(requestId);
       renderer.dispose();
     },
+    getCurve,
     setWidth,
+    onUpdate,
   };
 };
