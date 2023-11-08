@@ -13,7 +13,6 @@
     "pages:dev": "npx wrangler pages dev .vercel/output/static --compatibility-date=2023-10-30 --compatibility-flag=nodejs_compat"
   },
   "dependencies": {
-    "@react-spring/web": "^9.7.3",
     "fontfaceobserver": "^2.3.0",
     "next": "14.0.1",
     "react": "^18",
