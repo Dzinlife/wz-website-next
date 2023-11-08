@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { createDotSea } from "./dotSea";
 import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
@@ -134,12 +133,17 @@ const Header: React.FC = () => {
       tabsWithTextWidth,
       tabGap,
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navBarMaxWidth, tabs, fontLoaded]);
+
+  const route = useSelectedLayoutSegment();
 
   const tabsWithOffset = useMemo(() => {
     if (!curveLength) return;
 
-    const offsetLeft = (curveLength - navBarMaxWidth) / 2;
+    let offsetLeft = (curveLength - navBarMaxWidth) / 2;
+
+    if (!route) offsetLeft += 200;
 
     return tabsWithTextWidth.reduce((acc, tab, i) => {
       if (i === 0) {
@@ -158,7 +162,47 @@ const Header: React.FC = () => {
 
       return acc;
     }, [] as ((typeof tabsWithTextWidth)[0] & { offset: number })[]);
-  }, [navBarMaxWidth, tabsWithTextWidth, curveLength, tabGap]);
+  }, [navBarMaxWidth, tabsWithTextWidth, curveLength, tabGap, route]);
+
+  const { currentTab, routeIndex } = useMemo(() => {
+    const tabs =
+      tabsWithOffset ||
+      (tabsWithTextWidth as ((typeof tabsWithTextWidth)[0] & {
+        offset?: number;
+      })[]);
+
+    if (!route)
+      return {
+        currentTab: tabs[0],
+        routeIndex: 0,
+      };
+
+    const routeIndex = tabs.findIndex((n) => route === n.href.substring(1));
+
+    return {
+      currentTab: tabs[routeIndex],
+      routeIndex,
+    };
+  }, [tabsWithOffset, route, tabsWithTextWidth]);
+
+  const [prevRouteIndex, setPrevRouteIndex] = useState(routeIndex);
+
+  const direction = useMemo(() => {
+    if (prevRouteIndex === routeIndex) return 0;
+    if (prevRouteIndex < routeIndex) return 1;
+    if (prevRouteIndex > routeIndex) return -1;
+  }, [routeIndex, prevRouteIndex]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPrevRouteIndex(routeIndex);
+    }, 500);
+
+    return () => {
+      setPrevRouteIndex(routeIndex);
+      clearTimeout(timer);
+    };
+  }, [routeIndex]);
 
   const splitCurve = useCallback(
     (_curve: typeof curve, start: number, to: number) => {
@@ -224,55 +268,19 @@ const Header: React.FC = () => {
     [calcSegmentLength]
   );
 
-  const route = useSelectedLayoutSegment();
-
-  const { currentTab, routeIndex } = useMemo(() => {
-    const tabs =
-      tabsWithOffset ||
-      (tabsWithTextWidth as ((typeof tabsWithTextWidth)[0] & {
-        offset?: number;
-      })[]);
-
-    if (!route)
-      return {
-        currentTab: tabs[0],
-        routeIndex: 0,
-      };
-
-    const routeIndex = tabs.findIndex((n) => route === n.href.substring(1));
-
-    return {
-      currentTab: tabs[routeIndex],
-      routeIndex,
-    };
-  }, [tabsWithOffset, route, tabsWithTextWidth]);
-
-  const [prevRouteIndex, setPrevRouteIndex] = useState(routeIndex);
-
-  const direction = useMemo(() => {
-    if (prevRouteIndex === routeIndex) return 0;
-    if (prevRouteIndex < routeIndex) return 1;
-    if (prevRouteIndex > routeIndex) return -1;
-  }, [routeIndex, prevRouteIndex]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setPrevRouteIndex(routeIndex);
-    }, 500);
-
-    return () => {
-      setPrevRouteIndex(routeIndex);
-      clearTimeout(timer);
-    };
-  }, [routeIndex]);
-
-  const springLeftRef = useRef(Spring());
-  const springRightRef = useRef(Spring());
+  const springLeftRef = useRef(Spring<number>());
+  const springRightRef = useRef(Spring<number>());
+  const springTextRef = useRef(
+    Spring<number[]>([], { stiffness: 200, damping: 20 })
+  );
 
   useEffect(() => {
     springLeftRef.current.transitionTo(currentTab.offset);
     springRightRef.current.transitionTo(
       currentTab.offset ? currentTab.offset + currentTab.textWidth : undefined
+    );
+    springTextRef.current.transitionTo(
+      tabsWithOffset?.map((n) => n.offset) || []
     );
 
     switch (direction) {
@@ -292,7 +300,15 @@ const Header: React.FC = () => {
         break;
       }
     }
-  }, [currentTab, direction]);
+  }, [currentTab, direction, tabsWithOffset]);
+
+  const textOffset = springTextRef.current.getValue();
+
+  const rectOffset = textOffset.map((textOffset, i) => {
+    return (
+      textOffset + tabsWithTextWidth[i].textWidth / 2 - curveLength / 2 - 30
+    );
+  });
 
   const underlineCurvePath = useMemo(() => {
     const left = springLeftRef.current.getValue();
@@ -309,45 +325,43 @@ const Header: React.FC = () => {
   const router = useRouter();
 
   return (
-    <header>
-      <div className="relative top-[80px]">
-        <div ref={canvasWrapperRef}></div>
-        <svg className="w-full absolute left-0 top-[-32px] font-[Mark] font-bold text-[13px]">
-          <defs>
-            <path id={svgPathId} d={svgCurvePath}></path>
-          </defs>
-          {tabsWithOffset?.map((tab, i) => (
-            <a
-              key={i}
-              href=""
-              onClick={(e) => {
-                e.preventDefault();
-                router.push(tab.href);
-              }}
-            >
-              <rect></rect>
-              <text className="fill-white">
-                <textPath xlinkHref={`#${svgPathId}`} startOffset={tab.offset}>
-                  {tab.text}
-                </textPath>
-              </text>
-            </a>
-          ))}
-          <path
-            d={underlineCurvePath}
-            fill="transparent"
-            strokeWidth="2"
-            stroke="white"
-          ></path>
-        </svg>
-      </div>
-      <div className="hidden">
-        <Link href="/" prefetch={true}>
-          About
-        </Link>
-        <Link href="/works">Works</Link>
-        <Link href="/contact">Contact</Link>
-      </div>
+    <header className="relative top-[80px]">
+      <div ref={canvasWrapperRef}></div>
+      <svg className="w-full absolute left-0 top-[-32px] font-[Mark] font-bold text-[13px]">
+        <defs>
+          <path id={svgPathId} d={svgCurvePath}></path>
+        </defs>
+        {tabsWithOffset?.map((tab, i) => (
+          <a
+            key={i}
+            href=""
+            onClick={(e) => {
+              e.preventDefault();
+              router.push(tab.href);
+            }}
+          >
+            <rect
+              height="120"
+              width="60"
+              y="0"
+              x="50%"
+              fill="transparent"
+              transform={`translate(${rectOffset[i]})`}
+            ></rect>
+            <text className="fill-white">
+              <textPath xlinkHref={`#${svgPathId}`} startOffset={textOffset[i]}>
+                {tab.text}
+              </textPath>
+            </text>
+          </a>
+        ))}
+        <path
+          d={underlineCurvePath}
+          fill="transparent"
+          strokeWidth="2"
+          stroke="white"
+        ></path>
+      </svg>
     </header>
   );
 };
