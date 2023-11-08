@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { createDotSea } from "./dotSea";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const Header: React.FC = () => {
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
@@ -35,7 +35,9 @@ const Header: React.FC = () => {
     <header>
       <div ref={canvasWrapperRef}></div>
       <div>
-        <Link href="/">About</Link>
+        <Link href="/" prefetch={true}>
+          About
+        </Link>
         <Link href="/works">Works</Link>
         <Link href="/contact">Contact</Link>
       </div>
