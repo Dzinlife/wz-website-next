@@ -1,14 +1,36 @@
 "use client";
 import { createDotSea } from "./dotSea";
-import { useEffect, useRef, useCallback, useState, useMemo } from "react";
+import {
+  useEffect,
+  useRef,
+  useCallback,
+  useState,
+  useMemo,
+  useId,
+} from "react";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { useAsyncMemo } from "@/utils/useAsyncMemo";
 import FontFaceObserver from "fontfaceobserver";
 import Spring from "@/utils/tinySpring";
+import { useLayout } from "@/utils/useLayout";
+import Wz from "./Wz";
+import classNames from "classnames";
 
 const Header: React.FC = () => {
   const dotSeaRef = useRef<ReturnType<typeof createDotSea>>(null!);
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
+  const route = useSelectedLayoutSegment();
+
+  const layout = useLayout();
+
+  const [headerColor, setHeaderColor] = useState<"white" | "black">("black");
+
+  useEffect(() => {
+    const color = layout === "portrait" && !route ? "white" : "black";
+    setHeaderColor(color);
+
+    dotSeaRef.current?.setColor(color);
+  }, [layout, route]);
 
   const [curve, setCurve] = useState<[number, number][]>([]);
 
@@ -46,7 +68,7 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     dotSeaRef.current = createDotSea({
-      color: "white",
+      color: headerColor,
 
       width: window.innerWidth,
     });
@@ -92,7 +114,10 @@ const Header: React.FC = () => {
     []
   );
 
-  const [width, height] = [window.innerWidth, window.innerHeight];
+  const [width, height] = (() => {
+    if (typeof window === "undefined") return [0, 0];
+    return [window.innerWidth, window.innerHeight];
+  })();
 
   const navBarMaxWidth = useMemo(() => {
     let bottleneck = Math.min(width, height);
@@ -107,8 +132,13 @@ const Header: React.FC = () => {
   }, []);
 
   const { tabsWithTextWidth, tabGap } = useMemo(() => {
+    if (typeof document === "undefined")
+      return { tabsWithTextWidth: [], tabGap: 0 };
+
     const font = "bold 13px Mark";
-    const canvas = document.createElement("canvas");
+    const canvas = (() => {
+      return document.createElement("canvas");
+    })();
     const ctx = canvas.getContext("2d")!;
     ctx.font = font;
 
@@ -136,14 +166,13 @@ const Header: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navBarMaxWidth, tabs, fontLoaded]);
 
-  const route = useSelectedLayoutSegment();
-
   const tabsWithOffset = useMemo(() => {
     if (!curveLength) return;
 
     let offsetLeft = (curveLength - navBarMaxWidth) / 2;
 
-    if (!route) offsetLeft += 200;
+    if (!route && layout === "landscape") offsetLeft += 200;
+    if (layout === "portrait") offsetLeft += 10;
 
     return tabsWithTextWidth.reduce((acc, tab, i) => {
       if (i === 0) {
@@ -162,7 +191,7 @@ const Header: React.FC = () => {
 
       return acc;
     }, [] as ((typeof tabsWithTextWidth)[0] & { offset: number })[]);
-  }, [navBarMaxWidth, tabsWithTextWidth, curveLength, tabGap, route]);
+  }, [navBarMaxWidth, tabsWithTextWidth, curveLength, tabGap, route, layout]);
 
   const { currentTab, routeIndex } = useMemo(() => {
     const tabs =
@@ -320,14 +349,32 @@ const Header: React.FC = () => {
     return getPathPropByCurve(underlineCurve.map((p) => ((p[1] += 4), p)));
   }, [curve, getPathPropByCurve, splitCurve]);
 
-  const svgPathId = useState(`${(Math.random() * 10 ** 10).toFixed(0)}`)[0];
+  const svgPathId = useId();
 
   const router = useRouter();
 
+  const wzColor = useMemo(() => {
+    if (!route && layout === "landscape") return "white";
+    return headerColor;
+  }, [route, headerColor, layout]);
+
   return (
-    <header className="relative top-[80px]">
+    <header
+      className={classNames("absolute z-10", {
+        "top-[80px]": layout === "landscape",
+        "top-[110px]": layout === "portrait",
+      })}
+    >
       <div ref={canvasWrapperRef}></div>
-      <svg className="w-full absolute left-0 top-[-32px] font-[Mark] font-bold text-[13px]">
+      <Wz
+        color={wzColor}
+        height={28}
+        className={classNames({
+          "absolute left-16 top-7": layout === "landscape",
+          "absolute inset-0 m-auto -top-48": layout === "portrait",
+        })}
+      />
+      <svg className="w-full absolute left-0 -top-[32px] font-[Mark] font-bold text-[13px]">
         <defs>
           <path id={svgPathId} d={svgCurvePath}></path>
         </defs>
@@ -346,9 +393,9 @@ const Header: React.FC = () => {
               y="0"
               x="50%"
               fill="transparent"
-              transform={`translate(${rectOffset[i]})`}
+              transform={`translate(${rectOffset?.[i] ?? 0})`}
             ></rect>
-            <text className="fill-white">
+            <text fill={headerColor}>
               <textPath xlinkHref={`#${svgPathId}`} startOffset={textOffset[i]}>
                 {tab.text}
               </textPath>
@@ -359,7 +406,7 @@ const Header: React.FC = () => {
           d={underlineCurvePath}
           fill="transparent"
           strokeWidth="2"
-          stroke="white"
+          stroke={headerColor}
         ></path>
       </svg>
     </header>

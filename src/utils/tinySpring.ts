@@ -48,10 +48,6 @@ const Spring = <T extends number | number[] | undefined>(
 
     positions = motionList.map((n) => n.position);
 
-    console.log(motionList);
-
-    // onUpdate(position);
-
     if (motionList.some((n) => !n.isComplete))
       raf = requestAnimationFrame(interpolate);
     // else onRest(motionList.map(n => n.position) as T);
