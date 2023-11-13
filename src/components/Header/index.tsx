@@ -353,7 +353,7 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={classNames("relative z-30", {
+      className={classNames("relative", {
         "h-[230px] pt-[80px]": layout === "landscape",
         "h-[260px] pt-[110px]": layout === "portrait",
       })}
@@ -362,9 +362,9 @@ const Header: React.FC = () => {
       <Wz
         color={wzColor}
         height={28}
-        className={classNames("cursor-pointer", {
+        className={classNames("cursor-pointer z-10", {
           hidden: !layout,
-          "fixed z-20 top-[100px] left-16": layout === "landscape",
+          "fixed top-[100px] left-16": layout === "landscape",
           "absolute inset-0 m-auto -top-[110px]": layout === "portrait",
         })}
         onClick={() => {

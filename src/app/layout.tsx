@@ -50,6 +50,8 @@ export default function RootLayout({
   const routes = [null, "works", "contact"];
 
   const direction = useMemo(() => {
+    if (prevRoute === undefined) return;
+
     return routes.findIndex((routeName) => routeName === route) -
       routes.findIndex((routeName) => routeName === prevRoute) >
       0
@@ -57,26 +59,14 @@ export default function RootLayout({
       : "left";
   }, [routes, route, prevRoute]);
 
-  const transitionStyles = useMemo(() => {
-    return {
-      entering: { opacity: 1, transform: "translate3d(0,0,0)" },
-      entered: { opacity: 1, transfrom: "translate3d(0,0,0)" },
-      exiting: {
-        opacity: 0,
-        transform:
-          direction === "left"
-            ? "translate3d(-100px,0,0)"
-            : "translate3d(100px,0,0)",
-      },
-      exited: {
-        opacity: 0,
-        transform:
-          direction === "left"
-            ? "translate3d(-100px,0,0)"
-            : "translate3d(100px,0,0)",
-      },
-    } as Partial<Record<TransitionStatus, React.CSSProperties>>;
-  }, [direction]);
+  const [inProp, setInProp] = useState(true);
+
+  useEffect(() => {
+    setInProp(false);
+    requestAnimationFrame(() => {
+      setInProp(true);
+    });
+  }, [route]);
 
   return (
     <html lang="en">
@@ -89,40 +79,48 @@ export default function RootLayout({
           <Link href="/works">Works</Link>
           <Link href="/contact">Contact</Link>
         </div>
-        <style jsx>{`
-          .transition-wrapper {
-            pointer-events: none;
-            transition: ${duration}ms ease-in-out;
-            position: absolute;
-            top: 0;
-            width: 100%;
-            willchange: "content";
 
-            & > * {
-              pointer-events: auto;
-            }
+        <style jsx global>{`
+          .page-transition-enter {
+            opacity: 0;
+            ${direction === "left"
+              ? "transform: translate3d(-100px, 0, 0);"
+              : ""}
+            ${direction === "right"
+              ? "transform: translate3d(100px, 0, 0);"
+              : ""}
+          }
+          .page-transition-enter-active {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+            transition: ${duration}ms ease;
+          }
+          .page-transition-exit {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+          }
+          .page-transition-exit-active {
+            opacity: 0;
+            ${direction === "left"
+              ? "transform: translate3d(100px, 0, 0);"
+              : ""}
+            ${direction === "right"
+              ? "transform: translate3d(-100px, 0, 0);"
+              : ""}
+            transition: ${duration}ms ease;
           }
         `}</style>
-        <TransitionGroup>
-          <Transition
-            exit={false}
-            timeout={duration}
-            key={route}
-            mountOnEnter
-            unmountOnExit
-          >
-            {(state) => (
-              <div
-                className="transition-wrapper"
-                style={{
-                  ...transitionStyles[state],
-                }}
-              >
-                {children}
-              </div>
-            )}
-          </Transition>
-        </TransitionGroup>
+
+        <CSSTransition
+          in={inProp}
+          exit={false}
+          timeout={duration}
+          classNames="page-transition"
+          mountOnEnter
+          unmountOnExit
+        >
+          {children}
+        </CSSTransition>
       </body>
     </html>
   );

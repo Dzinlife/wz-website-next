@@ -1,10 +1,5 @@
 const Works: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return (
-    <div>
-      works-layout
-      {children}
-    </div>
-  );
+  return <div>{children}</div>;
 };
 
 export default Works;
