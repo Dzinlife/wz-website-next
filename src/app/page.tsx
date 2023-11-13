@@ -25,7 +25,7 @@ export default function Home() {
         }}
       />
       <div
-        className={classNames("h-10 w-[512px] pt-[240px] z-20", {})}
+        className={classNames("w-[512px] pt-[240px] z-20 pb-96", {})}
         style={
           layout && {
             marginLeft: paddingLeft,

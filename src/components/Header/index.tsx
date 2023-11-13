@@ -372,6 +372,9 @@ const Header: React.FC = () => {
         }}
       />
       <style jsx>{`
+        a {
+          -webkit-tap-highlight-color: transparent;
+        }
         text {
           transition: 0.07s ease-out;
         }

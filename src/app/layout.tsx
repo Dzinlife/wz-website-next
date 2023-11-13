@@ -32,23 +32,20 @@ export default function RootLayout({
 
   const route = useSelectedLayoutSegment();
 
-  const routeRef = useRef<typeof route | undefined>(undefined);
+  const routeRef = useRef({
+    currentRoute: route,
+    prevRoute: undefined as typeof route | undefined,
+  });
 
-  // if (routeRef.current.currentRoute !== route) {
-  //   const prevRoute = routeRef.current.currentRoute;
-  //   routeRef.current = {
-  //     currentRoute: route,
-  //     prevRoute,
-  //   };
-  // }
-
-  useEffect(() => {
-    return () => {
-      routeRef.current = route;
+  if (routeRef.current.currentRoute !== route) {
+    const prevRoute = routeRef.current.currentRoute;
+    routeRef.current = {
+      currentRoute: route,
+      prevRoute,
     };
-  }, [route]);
+  }
 
-  const prevRoute = routeRef.current;
+  const prevRoute = routeRef.current.prevRoute;
 
   const routes = [null, "works", "contact"];
 
