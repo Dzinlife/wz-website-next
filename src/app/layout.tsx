@@ -32,20 +32,23 @@ export default function RootLayout({
 
   const route = useSelectedLayoutSegment();
 
-  const routeRef = useRef({
-    currentRoute: route,
-    prevRoute: undefined as typeof route | undefined,
-  });
+  const routeRef = useRef<typeof route | undefined>(undefined);
 
-  if (routeRef.current.currentRoute !== route) {
-    const prevRoute = routeRef.current.currentRoute;
-    routeRef.current = {
-      currentRoute: route,
-      prevRoute,
+  // if (routeRef.current.currentRoute !== route) {
+  //   const prevRoute = routeRef.current.currentRoute;
+  //   routeRef.current = {
+  //     currentRoute: route,
+  //     prevRoute,
+  //   };
+  // }
+
+  useEffect(() => {
+    return () => {
+      routeRef.current = route;
     };
-  }
+  }, [route]);
 
-  const { prevRoute } = routeRef.current;
+  const prevRoute = routeRef.current;
 
   const routes = [null, "works", "contact"];
 
@@ -56,16 +59,6 @@ export default function RootLayout({
       ? "right"
       : "left";
   }, [routes, route, prevRoute]);
-
-  const defaultStyle = useMemo(() => {
-    return {
-      transition: `${duration}ms ease-in-out`,
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-    } as React.CSSProperties;
-  }, []);
 
   const transitionStyles = useMemo(() => {
     return {
@@ -99,6 +92,20 @@ export default function RootLayout({
           <Link href="/works">Works</Link>
           <Link href="/contact">Contact</Link>
         </div>
+        <style jsx>{`
+          .transition-wrapper {
+            pointer-events: none;
+            transition: ${duration}ms ease-in-out;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            willchange: "content";
+
+            & > * {
+              pointer-events: auto;
+            }
+          }
+        `}</style>
         <TransitionGroup>
           <Transition
             exit={false}
@@ -109,8 +116,8 @@ export default function RootLayout({
           >
             {(state) => (
               <div
+                className="transition-wrapper"
                 style={{
-                  ...defaultStyle,
                   ...transitionStyles[state],
                 }}
               >

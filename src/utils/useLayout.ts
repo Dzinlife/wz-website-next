@@ -1,7 +1,36 @@
-import { useEffect, useState } from "react";
+import { useSelectedLayoutSegment } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
-export const useLayout = () => {
+export const useLayout = (outterWidth?: number) => {
   const [layout, setLayout] = useState<"landscape" | "portrait">();
+
+  const route = useSelectedLayoutSegment();
+
+  const [, update] = useState({});
+
+  const [width, height] = (() => {
+    if (typeof window === "undefined") return [0, 0];
+    return [window.innerWidth, window.innerHeight];
+  })();
+
+  if (outterWidth === undefined) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (typeof window === "undefined") return;
+
+      const handler = () => {
+        update({});
+      };
+
+      window.addEventListener("resize", handler);
+
+      return () => {
+        window.removeEventListener("resize", handler);
+      };
+    }, []);
+  }
+
+  outterWidth = outterWidth ?? width;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -21,5 +50,26 @@ export const useLayout = () => {
     };
   }, []);
 
-  return layout;
+  const helloWidth = useMemo(() => {
+    if (!layout) return 0;
+    const bottleneck = width > 512 ? 512 : width;
+    return bottleneck * 0.72;
+  }, [width, layout]);
+
+  let paddingLeft = (outterWidth - helloWidth) / 2;
+
+  if (!route && layout === "landscape") {
+    const myHeadImgRatio = 1 / 5;
+    const contentWidth = width - height * myHeadImgRatio;
+
+    paddingLeft += width - contentWidth;
+  }
+
+  if (layout === "portrait") paddingLeft += 10;
+
+  return {
+    layout,
+    paddingLeft,
+    helloWidth,
+  };
 };

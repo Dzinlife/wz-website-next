@@ -4,27 +4,37 @@ import Image from "next/image";
 import me from "../assets/me.png";
 import classNames from "classnames";
 import { useLayout } from "@/utils/useLayout";
+import Hello from "@/components/Hello";
 
 export default function Home() {
-  const layout = useLayout();
+  const { layout, paddingLeft, helloWidth } = useLayout();
 
   return (
     <main className="flex min-h-screen ">
       <div
         className={classNames(
-          "fixed h-full w-full left-0 top-0 bg-no-repeat pointer-events-none",
+          "fixed h-full w-full left-0 top-0 bg-no-repeat z-10",
           {
-            "bg-contain": layout === "landscape",
-            "bg-left-top": layout === "landscape",
-            "bg-cover": layout === "portrait",
-            "bg-bottom": layout === "portrait",
-            "-z-10": layout === "portrait",
+            hidden: !layout,
+            "bg-contain bg-left-top": layout === "landscape",
+            "bg-cover bg-bottom": layout === "portrait",
           }
         )}
         style={{
           backgroundImage: `url(${me.src})`,
         }}
-      ></div>
+      />
+      <div
+        className={classNames("h-10 w-[512px] pt-[240px] z-20", {})}
+        style={
+          layout && {
+            marginLeft: paddingLeft,
+            width: helloWidth,
+          }
+        }
+      >
+        <Hello />
+      </div>
     </main>
   );
 }

@@ -21,19 +21,6 @@ const Header: React.FC = () => {
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
   const route = useSelectedLayoutSegment();
 
-  const layout = useLayout();
-
-  const [headerColor, setHeaderColor] = useState<"white" | "black">(
-    layout === "portrait" && !route ? "white" : "black"
-  );
-
-  useEffect(() => {
-    const color = layout === "portrait" && !route ? "white" : "black";
-    setHeaderColor(color);
-
-    dotSeaRef.current?.setColor(color);
-  }, [layout, route]);
-
   const [curve, setCurve] = useState<[number, number][]>([]);
 
   const getPathPropByCurve = useCallback((_curve: typeof curve) => {
@@ -67,6 +54,19 @@ const Header: React.FC = () => {
       return acc + (calcSegmentLength(curve[i - 1], point) || 0);
     }, 0);
   }, [curve, calcSegmentLength]);
+
+  const { layout, paddingLeft, helloWidth } = useLayout(curveLength);
+
+  const [headerColor, setHeaderColor] = useState<"white" | "black">(
+    layout === "portrait" && !route ? "white" : "black"
+  );
+
+  useEffect(() => {
+    const color = layout === "portrait" && !route ? "white" : "black";
+    setHeaderColor(color);
+
+    dotSeaRef.current?.setColor(color);
+  }, [layout, route]);
 
   useEffect(() => {
     dotSeaRef.current = createDotSea({
@@ -116,16 +116,6 @@ const Header: React.FC = () => {
     []
   );
 
-  const [width, height] = (() => {
-    if (typeof window === "undefined") return [0, 0];
-    return [window.innerWidth, window.innerHeight];
-  })();
-
-  const navBarMaxWidth = useMemo(() => {
-    const bottleneck = width > 512 ? 512 : width;
-    return bottleneck * 0.72;
-  }, [width]);
-
   const { data: fontLoaded } = useAsyncMemo(async () => {
     const font = "bold 13px Mark";
     await new FontFaceObserver("Mark", { weight: "bold" }).load(font);
@@ -160,35 +150,24 @@ const Header: React.FC = () => {
     );
 
     const tabGap =
-      (navBarMaxWidth - totalTextWidth) / (tabsWithTextWidth.length - 1);
+      (helloWidth - totalTextWidth) / (tabsWithTextWidth.length - 1);
 
     return {
       tabsWithTextWidth,
       tabGap: Math.max(MIN, tabGap),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navBarMaxWidth, tabs, fontLoaded]);
+  }, [helloWidth, tabs, fontLoaded]);
 
   const tabsWithOffset = useMemo(() => {
     if (!curveLength) return;
-
-    let offsetLeft = (curveLength - navBarMaxWidth) / 2;
-
-    if (!route && layout === "landscape") {
-      const myHeadImgRatio = 1 / 5;
-      const contentWidth = width - height * myHeadImgRatio;
-
-      offsetLeft += width - contentWidth;
-    }
-
-    if (layout === "portrait") offsetLeft += 10;
 
     return tabsWithTextWidth.reduce((acc, tab, i) => {
       if (i === 0) {
         return [
           {
             ...tab,
-            offset: offsetLeft,
+            offset: paddingLeft,
           },
         ];
       }
@@ -200,16 +179,7 @@ const Header: React.FC = () => {
 
       return acc;
     }, [] as ((typeof tabsWithTextWidth)[0] & { offset: number })[]);
-  }, [
-    navBarMaxWidth,
-    tabsWithTextWidth,
-    curveLength,
-    tabGap,
-    route,
-    layout,
-    width,
-    height,
-  ]);
+  }, [tabsWithTextWidth, tabGap, paddingLeft, curveLength]);
 
   const { currentTab, routeIndex } = useMemo(() => {
     const tabs =
@@ -378,9 +348,9 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={classNames("absolute z-10", {
-        "top-[80px]": layout === "landscape",
-        "top-[110px]": layout === "portrait",
+      className={classNames("relative z-30", {
+        "h-[230px] pt-[80px]": layout === "landscape",
+        "h-[260px] pt-[110px]": layout === "portrait",
       })}
     >
       <div ref={canvasWrapperRef}></div>
@@ -389,11 +359,11 @@ const Header: React.FC = () => {
         height={28}
         className={classNames({
           hidden: !layout,
-          "absolute left-16 top-7": layout === "landscape",
-          "absolute inset-0 m-auto -top-48": layout === "portrait",
+          "fixed z-20 top-[100px] left-16": layout === "landscape",
+          "absolute inset-0 m-auto -top-[110px]": layout === "portrait",
         })}
       />
-      <svg className="w-full absolute left-0 -top-[32px] font-[Mark] font-bold text-[13px]">
+      <svg className="w-full absolute bottom-[36px] left-0 font-[Mark] font-bold text-[13px]">
         <defs>
           <path id={svgPathId} d={svgCurvePath}></path>
         </defs>
@@ -426,7 +396,7 @@ const Header: React.FC = () => {
           fill="transparent"
           strokeWidth="2"
           stroke={headerColor}
-        ></path>
+        />
       </svg>
     </header>
   );
