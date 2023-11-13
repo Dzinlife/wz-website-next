@@ -167,14 +167,18 @@ const Header: React.FC = () => {
         return [
           {
             ...tab,
-            offset: paddingLeft,
+            offset: paddingLeft + tab.textWidth / 2,
           },
         ];
       }
 
       acc.push({
         ...tab,
-        offset: acc[i - 1].offset + acc[i - 1].textWidth + tabGap,
+        offset:
+          acc[i - 1].offset +
+          acc[i - 1].textWidth / 2 +
+          tabGap +
+          tab.textWidth / 2,
       });
 
       return acc;
@@ -287,16 +291,19 @@ const Header: React.FC = () => {
 
   const springLeftRef = useRef(Spring<number>());
   const springRightRef = useRef(Spring<number>());
-  const springTextRef = useRef(
+  const springCenterRef = useRef(
     Spring<number[]>([], { stiffness: 200, damping: 20 })
   );
 
   useEffect(() => {
-    springLeftRef.current.transitionTo(currentTab.offset);
-    springRightRef.current.transitionTo(
-      currentTab.offset ? currentTab.offset + currentTab.textWidth : undefined
-    );
-    springTextRef.current.transitionTo(
+    const { offset, textWidth } = currentTab || {};
+
+    const offsetLeft = offset ? offset - currentTab.textWidth / 2 : offset;
+    const offsetRight = offsetLeft ? offsetLeft + textWidth : offsetLeft;
+
+    springLeftRef.current.transitionTo(offsetLeft);
+    springRightRef.current.transitionTo(offsetRight);
+    springCenterRef.current.transitionTo(
       tabsWithOffset?.map((n) => n.offset) || []
     );
 
@@ -319,12 +326,10 @@ const Header: React.FC = () => {
     }
   }, [currentTab, direction, tabsWithOffset]);
 
-  const textOffset = springTextRef.current.getValue();
+  const textOffset = springCenterRef.current.getValue();
 
   const rectOffset = textOffset.map((textOffset, i) => {
-    return (
-      textOffset + tabsWithTextWidth[i].textWidth / 2 - curveLength / 2 - 30
-    );
+    return textOffset - curveLength / 2 - 40;
   });
 
   const underlineCurvePath = useMemo(() => {
@@ -357,18 +362,37 @@ const Header: React.FC = () => {
       <Wz
         color={wzColor}
         height={28}
-        className={classNames({
+        className={classNames("cursor-pointer", {
           hidden: !layout,
           "fixed z-20 top-[100px] left-16": layout === "landscape",
           "absolute inset-0 m-auto -top-[110px]": layout === "portrait",
         })}
+        onClick={() => {
+          router.push("/");
+        }}
       />
+      <style jsx>{`
+        text {
+          transition: 0.07s ease-out;
+        }
+        rect:hover + text:not(.focus),
+        text:not(.focus):hover {
+          font-size: 16px;
+        }
+      `}</style>
       <svg className="w-full absolute bottom-[36px] left-0 font-[Mark] font-bold text-[13px]">
         <defs>
           <path id={svgPathId} d={svgCurvePath}></path>
         </defs>
+        <path
+          d={underlineCurvePath}
+          fill="transparent"
+          strokeWidth="2"
+          stroke={headerColor}
+        />
         {tabsWithOffset?.map((tab, i) => (
           <a
+            className="cursor-pointer"
             key={i}
             href=""
             onClick={(e) => {
@@ -378,25 +402,23 @@ const Header: React.FC = () => {
           >
             <rect
               height="120"
-              width="60"
+              width="80"
               y="0"
               x="50%"
               fill="transparent"
               transform={`translate(${rectOffset?.[i] ?? 0})`}
-            ></rect>
-            <text fill={headerColor}>
+            />
+            <text
+              fill={headerColor}
+              textAnchor="middle"
+              className={currentTab === tab ? "focus" : ""}
+            >
               <textPath xlinkHref={`#${svgPathId}`} startOffset={textOffset[i]}>
                 {tab.text}
               </textPath>
             </text>
           </a>
         ))}
-        <path
-          d={underlineCurvePath}
-          fill="transparent"
-          strokeWidth="2"
-          stroke={headerColor}
-        />
       </svg>
     </header>
   );

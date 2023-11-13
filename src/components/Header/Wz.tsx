@@ -4,7 +4,8 @@ const Wz: React.FC<{
   width?: string | number;
   style?: React.CSSProperties;
   className?: string;
-}> = ({ color, height, width, style, className }) => {
+  onClick?: React.MouseEventHandler<HTMLOrSVGElement>;
+}> = ({ color, height, width, style, className, onClick }) => {
   return (
     <svg
       width={width}
@@ -12,6 +13,7 @@ const Wz: React.FC<{
       viewBox="0 0 624 467"
       style={style}
       className={className}
+      onClick={onClick}
     >
       <path
         fill={color}
