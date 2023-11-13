@@ -23,7 +23,9 @@ const Header: React.FC = () => {
 
   const layout = useLayout();
 
-  const [headerColor, setHeaderColor] = useState<"white" | "black">("black");
+  const [headerColor, setHeaderColor] = useState<"white" | "black">(
+    layout === "portrait" && !route ? "white" : "black"
+  );
 
   useEffect(() => {
     const color = layout === "portrait" && !route ? "white" : "black";
@@ -120,10 +122,9 @@ const Header: React.FC = () => {
   })();
 
   const navBarMaxWidth = useMemo(() => {
-    let bottleneck = Math.min(width, height);
-    bottleneck = bottleneck > 512 ? 512 : bottleneck;
+    const bottleneck = width > 512 ? 512 : width;
     return bottleneck * 0.72;
-  }, [width, height]);
+  }, [width]);
 
   const { data: fontLoaded } = useAsyncMemo(async () => {
     const font = "bold 13px Mark";
@@ -132,8 +133,10 @@ const Header: React.FC = () => {
   }, []);
 
   const { tabsWithTextWidth, tabGap } = useMemo(() => {
+    const MIN = 0;
+
     if (typeof document === "undefined")
-      return { tabsWithTextWidth: [], tabGap: 0 };
+      return { tabsWithTextWidth: [], tabGap: MIN };
 
     const font = "bold 13px Mark";
     const canvas = (() => {
@@ -161,7 +164,7 @@ const Header: React.FC = () => {
 
     return {
       tabsWithTextWidth,
-      tabGap,
+      tabGap: Math.max(MIN, tabGap),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navBarMaxWidth, tabs, fontLoaded]);
@@ -171,7 +174,13 @@ const Header: React.FC = () => {
 
     let offsetLeft = (curveLength - navBarMaxWidth) / 2;
 
-    if (!route && layout === "landscape") offsetLeft += 200;
+    if (!route && layout === "landscape") {
+      const myHeadImgRatio = 1 / 5;
+      const contentWidth = width - height * myHeadImgRatio;
+
+      offsetLeft += width - contentWidth;
+    }
+
     if (layout === "portrait") offsetLeft += 10;
 
     return tabsWithTextWidth.reduce((acc, tab, i) => {
@@ -191,7 +200,16 @@ const Header: React.FC = () => {
 
       return acc;
     }, [] as ((typeof tabsWithTextWidth)[0] & { offset: number })[]);
-  }, [navBarMaxWidth, tabsWithTextWidth, curveLength, tabGap, route, layout]);
+  }, [
+    navBarMaxWidth,
+    tabsWithTextWidth,
+    curveLength,
+    tabGap,
+    route,
+    layout,
+    width,
+    height,
+  ]);
 
   const { currentTab, routeIndex } = useMemo(() => {
     const tabs =
@@ -370,6 +388,7 @@ const Header: React.FC = () => {
         color={wzColor}
         height={28}
         className={classNames({
+          hidden: !layout,
           "absolute left-16 top-7": layout === "landscape",
           "absolute inset-0 m-auto -top-48": layout === "portrait",
         })}

@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 
 export const useLayout = () => {
-  const [layout, setLayout] = useState<"landscape" | "portrait">(
-    typeof window !== "undefined" &&
-      window.matchMedia("(min-aspect-ratio: 4/3)").matches
-      ? "landscape"
-      : "portrait"
-  );
+  const [layout, setLayout] = useState<"landscape" | "portrait">();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -16,6 +11,8 @@ export const useLayout = () => {
     const handler = () => {
       setLayout(mediaQuery.matches ? "landscape" : "portrait");
     };
+
+    handler();
 
     mediaQuery.addEventListener("change", handler);
 
