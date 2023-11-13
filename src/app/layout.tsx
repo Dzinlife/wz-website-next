@@ -75,6 +75,12 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        ></meta>
+      </head>
       <body
         className={classNames(inter.className, "flex flex-col min-h-screen")}
       >
@@ -130,7 +136,7 @@ export default function RootLayout({
         </CSSTransition>
         <footer
           style={{ fontFamily: "Mark" }}
-          className="ml-auto mt-auto text-[36px]  leading-none"
+          className="ml-auto mt-auto text-[24px]  leading-none"
         >
           ©{year}
         </footer>

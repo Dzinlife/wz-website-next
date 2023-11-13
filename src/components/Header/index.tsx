@@ -373,9 +373,6 @@ const Header: React.FC = () => {
         }}
       />
       <style jsx>{`
-        a {
-          -webkit-tap-highlight-color: transparent;
-        }
         text {
           transition: 0.07s ease-out;
         }
@@ -395,10 +392,9 @@ const Header: React.FC = () => {
           stroke={headerColor}
         />
         {tabsWithOffset?.map((tab, i) => (
-          <a
+          <g
             className="cursor-pointer"
             key={i}
-            href=""
             onClick={(e) => {
               e.preventDefault();
               router.push(tab.href);
@@ -421,7 +417,7 @@ const Header: React.FC = () => {
                 {tab.text}
               </textPath>
             </text>
-          </a>
+          </g>
         ))}
       </svg>
     </header>

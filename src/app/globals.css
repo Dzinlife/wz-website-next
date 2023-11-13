@@ -17,6 +17,8 @@
 } */
 
 body {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   /* color: rgb(var(--foreground-rgb)); */
   /* background: linear-gradient(
       to bottom,

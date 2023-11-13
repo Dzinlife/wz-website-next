@@ -33,7 +33,7 @@ export default function Home() {
           <div
             className={classNames(
               "page-transition-wrapper",
-              "fixed h-full w-full left-0 top-0 bg-no-repeat pointer-events-none -z-10",
+              "sticky bottom-0 min-h-screen w-full bg-no-repeat pointer-events-none -z-10 mt-[-100vh]",
               {
                 hidden: !layout,
                 "bg-contain bg-left-top": layout === "landscape",
