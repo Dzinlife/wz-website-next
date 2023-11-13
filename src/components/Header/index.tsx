@@ -62,7 +62,8 @@ const Header: React.FC = () => {
   );
 
   useEffect(() => {
-    const color = layout === "portrait" && !route ? "white" : "black";
+    // const color = layout === "portrait" && !route ? "white" : "black";
+    const color = "white";
     setHeaderColor(color);
 
     dotSeaRef.current?.setColor(color);
@@ -353,7 +354,7 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={classNames("relative", {
+      className={classNames("relative mix-blend-difference", {
         "h-[230px] pt-[80px]": layout === "landscape",
         "h-[260px] pt-[110px]": layout === "portrait",
       })}

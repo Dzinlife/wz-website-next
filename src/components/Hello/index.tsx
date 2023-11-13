@@ -1,5 +1,6 @@
 import { useLayout } from "@/utils/useLayout";
 import classNames from "classnames";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 const Hello: React.FC = () => {
@@ -13,6 +14,8 @@ const Hello: React.FC = () => {
         return "white";
     }
   }, [layout]);
+
+  const router = useRouter();
 
   return (
     <div
@@ -61,9 +64,16 @@ const Hello: React.FC = () => {
         </div>
         <div>
           <span style={{ fontSize: "32em" }}>Free free to</span>
-          <span style={{ fontSize: "65em", lineHeight: "1.3em" }}>
+          <span
+            // className="relative"
+            style={{ fontSize: "65em", lineHeight: "1.3em" }}
+            onClick={() => router.push("/contact")}
+          >
             {" "}
-            contact
+            <span className="inline-block cursor-pointer hover:bg-black hover:text-white transition-all hover:shadow-[0_-0.1em_0_0_rgba(0,0,0,1)]">
+              contact
+            </span>
+            <div className="border-b-[3px] border-white border-dashed relative left-[3.53em] bottom-[0.06em] w-[4.39em] mix-blend-difference "></div>
           </span>
         </div>
       </div>

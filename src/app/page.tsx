@@ -19,7 +19,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="flex min-h-screen ">
+    <main>
       {ReactDOM.createPortal(
         <CSSTransition
           in={showMe}
@@ -33,7 +33,7 @@ export default function Home() {
           <div
             className={classNames(
               "page-transition-wrapper",
-              "fixed h-full w-full left-0 top-0 bg-no-repeat pointer-events-none",
+              "fixed h-full w-full left-0 top-0 bg-no-repeat pointer-events-none -z-10",
               {
                 hidden: !layout,
                 "bg-contain bg-left-top": layout === "landscape",
@@ -48,7 +48,10 @@ export default function Home() {
         document.body
       )}
       <div
-        className={classNames("w-[512px] pt-[0px] z-20 pb-96", {})}
+        className={classNames("w-[512px] pt-[0px] z-20", {
+          "pb-24": layout === "landscape",
+          "pb-96": layout === "portrait",
+        })}
         style={
           layout && {
             marginLeft: paddingLeft,

@@ -20,6 +20,7 @@ import React, {
   useState,
 } from "react";
 import { useSearchParams, useSelectedLayoutSegment } from "next/navigation";
+import classNames from "classnames";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -68,9 +69,15 @@ export default function RootLayout({
     });
   }, [route]);
 
+  const year = useMemo(() => {
+    return new Date().getFullYear();
+  }, []);
+
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body
+        className={classNames(inter.className, "flex flex-col min-h-screen")}
+      >
         <Header />
         <div className="hidden">
           <Link href="/" prefetch={true}>
@@ -121,6 +128,12 @@ export default function RootLayout({
         >
           {children}
         </CSSTransition>
+        <footer
+          style={{ fontFamily: "Mark" }}
+          className="ml-auto mt-auto text-[36px]  leading-none"
+        >
+          ©{year}
+        </footer>
       </body>
     </html>
   );
