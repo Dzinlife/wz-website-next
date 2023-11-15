@@ -30,11 +30,8 @@ export default function RootLayout({
         className={classNames(inter.className, "flex flex-col min-h-screen")}
       >
         <ClientLayout>{children}</ClientLayout>
-        <footer
-          style={{ fontFamily: "Mark" }}
-          className="ml-auto mt-auto text-[16px] font-bold leading-none pr-2"
-        >
-          FallInLife.com©{new Date().getFullYear()}
+        <footer className="ml-auto mt-auto text-[16px] leading-none pr-2">
+          © fallinlife.com {new Date().getFullYear()}
         </footer>
       </body>
     </html>

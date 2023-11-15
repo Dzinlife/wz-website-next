@@ -5,31 +5,19 @@ import classNames from "classnames";
 import { useLayout } from "@/utils/useLayout";
 import Hello from "@/components/Hello";
 import { CSSTransition } from "react-transition-group";
-import { useEffect, useLayoutEffect, useState } from "react";
-import { FrozenRouter } from "./clientLayout";
 import { usePathname } from "next/navigation";
 
 export default function Home() {
   const { layout, offsetLeft, helloWidth } = useLayout();
 
-  const [showMe, setShowMe] = useState(false);
-
   const pathname = usePathname();
-
-  useLayoutEffect(() => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setShowMe(pathname === "/");
-      });
-    });
-  }, [pathname]);
 
   return (
     <main>
       {layout
         ? ReactDOM.createPortal(
             <CSSTransition
-              in={showMe}
+              in={pathname === "/"}
               appear
               exit={true}
               timeout={700}
@@ -37,21 +25,19 @@ export default function Home() {
               mountOnEnter
               unmountOnExit
             >
-              <FrozenRouter key={pathname === "/" ? 0 : 1}>
-                <div
-                  className={classNames(
-                    "sticky bottom-0 h-screen w-[200vw] top-0 bg-no-repeat pointer-events-none -z-10 mt-[-100vh]",
-                    {
-                      "bg-contain bg-left-top": layout === "landscape",
-                      "bg-[length:60%_auto] bg-left-bottom -z-10":
-                        layout === "portrait",
-                    }
-                  )}
-                  style={{
-                    backgroundImage: `url(${me.src})`,
-                  }}
-                ></div>
-              </FrozenRouter>
+              <div
+                className={classNames(
+                  "sticky bottom-0 h-screen w-[200vw] top-0 bg-no-repeat pointer-events-none -z-10 mt-[-100vh]",
+                  {
+                    "bg-contain bg-left-top": layout === "landscape",
+                    "bg-[length:60%_auto] bg-left-bottom -z-10":
+                      layout === "portrait",
+                  }
+                )}
+                style={{
+                  backgroundImage: `url(${me.src})`,
+                }}
+              ></div>
             </CSSTransition>,
             document.body
           )

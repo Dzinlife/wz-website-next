@@ -14,7 +14,7 @@ import { useLayout } from "@/utils/useLayout";
 //@ts-ignore
 import wcmatch from "wildcard-match";
 
-export const FrozenRouter: React.FC<React.PropsWithChildren> = (props) => {
+const FrozenRouter: React.FC<React.PropsWithChildren> = (props) => {
   const context = useContext(LayoutRouterContext);
   const frozen = useRef(context).current;
 
@@ -77,11 +77,13 @@ export default function ClientLayout({
       : -1;
   }, [rules, route, routes, prevPath]);
 
-  const { helloWidth } = useLayout();
+  const { helloWidth, layout } = useLayout();
+  1;
+  if (!layout) return null;
 
   let test = helloWidth;
 
-  if (route === null || routeRef.current.prevRoute === null) test += helloWidth;
+  if (route === "" || routeRef.current.prevRoute === "") test += helloWidth;
 
   return (
     <>
@@ -106,6 +108,16 @@ export default function ClientLayout({
         }
       `}</style>
       <style jsx global>{`
+        .page-transition-appear {
+          opacity: 0;
+          ${direction < 0 ? `transform: translate3d(-${test}px, 0, 0);` : ""}
+          ${direction > 0 ? `transform: translate3d(${test}px, 0, 0);` : ""}
+        }
+        .page-transition-appear-active {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+          transition: ${duration}ms ease;
+        }
         .page-transition-enter {
           opacity: 0;
           ${direction < 0 ? `transform: translate3d(-${test}px, 0, 0);` : ""}
@@ -132,6 +144,7 @@ export default function ClientLayout({
         <CSSTransition
           in={true}
           exit={true}
+          appear
           timeout={duration}
           mountOnEnter
           unmountOnExit
