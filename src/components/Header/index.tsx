@@ -55,19 +55,21 @@ const Header: React.FC = () => {
     }, 0);
   }, [curve, calcSegmentLength]);
 
-  const { layout, paddingLeft, helloWidth } = useLayout(curveLength);
+  const { layout, offsetLeft, helloWidth } = useLayout(curveLength);
 
-  const [headerColor, setHeaderColor] = useState<"white" | "black">(
-    layout === "portrait" && !route ? "white" : "black"
-  );
+  const [headerColor, setHeaderColor] = useState<"white" | "black">("white");
 
-  useEffect(() => {
-    // const color = layout === "portrait" && !route ? "white" : "black";
-    const color = "white";
-    setHeaderColor(color);
+  // const [headerColor, setHeaderColor] = useState<"white" | "black">(
+  //   layout === "portrait" && !route ? "white" : "black"
+  // );
 
-    dotSeaRef.current?.setColor(color);
-  }, [layout, route]);
+  // useEffect(() => {
+  //   // const color = layout === "portrait" && !route ? "white" : "black";
+  //   const color = "white";
+  //   setHeaderColor(color);
+
+  //   dotSeaRef.current?.setColor(color);
+  // }, [layout, route]);
 
   useEffect(() => {
     dotSeaRef.current = createDotSea({
@@ -97,7 +99,7 @@ const Header: React.FC = () => {
       window.removeEventListener("resize", resizeHandler);
       destroy();
     };
-  }, []);
+  }, [headerColor]);
 
   const tabs = useMemo(
     () => [
@@ -168,7 +170,7 @@ const Header: React.FC = () => {
         return [
           {
             ...tab,
-            offset: paddingLeft + tab.textWidth / 2,
+            offset: offsetLeft + tab.textWidth / 2,
           },
         ];
       }
@@ -184,7 +186,7 @@ const Header: React.FC = () => {
 
       return acc;
     }, [] as ((typeof tabsWithTextWidth)[0] & { offset: number })[]);
-  }, [tabsWithTextWidth, tabGap, paddingLeft, curveLength]);
+  }, [tabsWithTextWidth, tabGap, offsetLeft, curveLength]);
 
   const { currentTab, routeIndex } = useMemo(() => {
     const tabs =

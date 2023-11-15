@@ -16,6 +16,12 @@
   }
 } */
 
+html {
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
 body {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -33,6 +39,7 @@ body {
   font-family: 'Mark';
   src: local('Mark-Bold'),
       url('/Mark-Bold.woff2') format('woff2');
+      /* url('/FFMark-Bold.woff2') format('woff2'); */
   font-weight: bold;
   font-style: normal;
 }

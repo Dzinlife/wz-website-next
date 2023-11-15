@@ -56,20 +56,25 @@ export const useLayout = (outterWidth?: number) => {
     return bottleneck * 0.72;
   }, [width, layout]);
 
-  let paddingLeft = (outterWidth - helloWidth) / 2;
+  let offsetLeft = (outterWidth - helloWidth) / 2;
+
+  let offsetCenter = 0;
 
   if (!route && layout === "landscape") {
     const myHeadImgRatio = 1 / 5;
     const contentWidth = width - height * myHeadImgRatio;
 
-    paddingLeft += width - contentWidth;
+    offsetCenter = width - contentWidth;
   }
 
-  if (layout === "portrait") paddingLeft += 10;
+  if (layout === "portrait") offsetCenter += 5;
+
+  offsetLeft += offsetCenter;
 
   return {
     layout,
-    paddingLeft,
+    offsetLeft,
     helloWidth,
+    offsetCenter,
   };
 };
