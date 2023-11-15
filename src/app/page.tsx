@@ -37,7 +37,7 @@ export default function Home() {
               mountOnEnter
               unmountOnExit
             >
-              <FrozenRouter key={pathname}>
+              <FrozenRouter key={pathname === "/" ? 0 : 1}>
                 <div
                   className={classNames(
                     "sticky bottom-0 h-screen w-[200vw] top-0 bg-no-repeat pointer-events-none -z-10 mt-[-100vh]",

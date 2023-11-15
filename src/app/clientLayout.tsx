@@ -4,9 +4,15 @@ import Header from "@/components/Header";
 import Link from "next/link";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import React, { useContext, useMemo, useRef } from "react";
-import { useSelectedLayoutSegment } from "next/navigation";
+import {
+  usePathname,
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+} from "next/navigation";
 import { LayoutRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useLayout } from "@/utils/useLayout";
+//@ts-ignore
+import wcmatch from "wildcard-match";
 
 export const FrozenRouter: React.FC<React.PropsWithChildren> = (props) => {
   const context = useContext(LayoutRouterContext);
@@ -26,44 +32,56 @@ export default function ClientLayout({
 }) {
   const duration = 700;
 
-  const route = useSelectedLayoutSegment();
+  const pathname = usePathname();
+
+  const route = useSelectedLayoutSegment() || "";
+  const routes = useSelectedLayoutSegments();
 
   const routeRef = useRef({
+    currentPath: pathname,
+    prevPath: undefined as typeof pathname | undefined,
     currentRoute: route,
     prevRoute: undefined as typeof route | undefined,
+    currentRoutes: routes,
+    prevRoutes: undefined as typeof routes | undefined,
   });
 
-  if (routeRef.current.currentRoute !== route) {
+  if (routeRef.current.currentPath !== pathname) {
+    const prevPath = routeRef.current.currentRoute;
     const prevRoute = routeRef.current.currentRoute;
+    const prevRoutes = routeRef.current.currentRoutes;
+
     routeRef.current = {
+      currentPath: pathname,
       currentRoute: route,
+      currentRoutes: routes,
+      prevPath,
       prevRoute,
+      prevRoutes,
     };
   }
 
-  const prevRoute = routeRef.current.prevRoute;
+  const prevPath = routeRef.current.prevPath;
 
-  const routes = useMemo(() => [null, "works", "contact"], []);
+  const rules = useMemo(() => ["", "works", "works/*", "contact"], []);
 
   const direction = useMemo(() => {
-    if (prevRoute === undefined) return 0;
+    if (prevPath === undefined) return 0;
 
-    return routes.findIndex((routeName) => routeName === route) -
-      routes.findIndex((routeName) => routeName === prevRoute) >
+    if (routes.length > 1) return 1;
+
+    return rules.findIndex((rule) => wcmatch(rule)(route)) -
+      rules.findIndex((rule) => wcmatch(rule)(prevPath)) >
       0
       ? 1
       : -1;
-  }, [routes, route, prevRoute]);
-
-  const year = useMemo(() => {
-    return new Date().getFullYear();
-  }, []);
+  }, [rules, route, routes, prevPath]);
 
   const { helloWidth } = useLayout();
 
   let test = helloWidth;
 
-  if (route === null || prevRoute === null) test += helloWidth;
+  if (route === null || routeRef.current.prevRoute === null) test += helloWidth;
 
   return (
     <>
@@ -118,17 +136,11 @@ export default function ClientLayout({
           mountOnEnter
           unmountOnExit
           classNames="page-transition"
-          key={route}
+          key={pathname}
         >
           <FrozenRouter>{children}</FrozenRouter>
         </CSSTransition>
       </TransitionGroup>
-      <footer
-        style={{ fontFamily: "Mark" }}
-        className="ml-auto mt-auto text-[16px] font-bold leading-none pr-2"
-      >
-        FallInLife.com©{year}
-      </footer>
     </>
   );
 }

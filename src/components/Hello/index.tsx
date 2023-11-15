@@ -1,5 +1,6 @@
 import { useLayout } from "@/utils/useLayout";
 import classNames from "classnames";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -131,24 +132,23 @@ const Hello: React.FC = () => {
           <div>
             <span className="text-[32em]">Free free to</span>
 
-            <span
-              style={{ fontSize: "65em", lineHeight: "1.3em" }}
-              onClick={() => router.push("/contact")}
-            >
-              {" "}
-              <span
-                className="use-color-scheme contact"
-                style={{ color: colorScheme[4] }}
-              >
-                contact
+            <Link href="/contact">
+              <span style={{ fontSize: "65em", lineHeight: "1.3em" }}>
+                {" "}
+                <span
+                  className="use-color-scheme contact"
+                  style={{ color: colorScheme[4] }}
+                >
+                  contact
+                </span>
+                <div
+                  style={{
+                    borderColor: colorScheme[4],
+                  }}
+                  className="use-color-scheme border-b-[3px] border-dotted relative left-[3.53em] bottom-[0.06em] w-[4.39em]"
+                />
               </span>
-              <div
-                style={{
-                  borderColor: colorScheme[4],
-                }}
-                className="use-color-scheme border-b-[3px] border-dotted relative left-[3.53em] bottom-[0.06em] w-[4.39em]"
-              />
-            </span>
+            </Link>
           </div>
         </div>
       </div>
