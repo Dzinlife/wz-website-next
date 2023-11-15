@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const Works: React.FC = () => {
   return (
-    <div className="w-96 mx-auto">
+    <div className="w-96 mx-auto bg-red-100">
       {allPosts.map((post) => {
         return (
           <div key={post._id} className="text-7xl">
