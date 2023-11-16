@@ -1,20 +1,21 @@
-import { allPosts, Post } from "contentlayer/generated";
+"use client";
 
-export const generateStaticParams = async () => {
-  return allPosts.map((post) => {
-    return { slug: post.url };
-  });
-};
+import { fetchPageBySlug, notion as _notion } from "@/utils/notion";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import Renderer from "./Renderer";
+import { useAsyncMemo } from "@/utils/useAsyncMemo";
+import { Suspense, cache } from "react";
+import useSWR from "swr";
+import { NotionRenderer } from "react-notion-x";
 
 const Work: React.FC<{ params: { slug: string } }> = ({ params }) => {
-  const post = allPosts.find((post) => post.url === params.slug);
-
   return (
     <div>
-      <div>{post?.date}</div>
-      <div>{post?.title}</div>
-      <div>{post?.body.raw}</div>
-      {/* <div>{JSON.stringify(allPosts)}</div> */}
+      <div>123</div>
+      <Suspense fallback={<div>loading</div>}>
+        <Renderer slug={params.slug} />
+      </Suspense>
     </div>
   );
 };

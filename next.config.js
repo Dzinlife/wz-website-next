@@ -1,8 +1,17 @@
-const { withContentlayer } = require('next-contentlayer')
-
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    swcMinify: true
-}
-
-module.exports = withContentlayer(nextConfig)
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true'
+  })
+  
+  module.exports = withBundleAnalyzer({
+    staticPageGenerationTimeout: 3000,
+    images: {
+      domains: [
+        'www.notion.so',
+        'notion.so',
+        'images.unsplash.com',
+        'pbs.twimg.com'
+      ],
+      formats: ['image/avif', 'image/webp']
+    }
+  })
+  

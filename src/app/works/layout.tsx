@@ -1,5 +1,5 @@
 const Works: React.FC<React.PropsWithChildren> = ({ children }) => {
-  return <div>{children}</div>;
+  return children;
 };
 
 export default Works;

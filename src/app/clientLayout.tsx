@@ -3,14 +3,7 @@
 import Header from "@/components/Header";
 import Link from "next/link";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
-import React, {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   usePathname,
   useSelectedLayoutSegment,
@@ -20,7 +13,6 @@ import { LayoutRouterContext } from "next/dist/shared/lib/app-router-context.sha
 import { useLayout } from "@/utils/useLayout";
 //@ts-ignore
 import wcmatch from "wildcard-match";
-import { off } from "process";
 
 const FrozenRouter: React.FC<React.PropsWithChildren> = (props) => {
   const context = useContext(LayoutRouterContext);
@@ -114,8 +106,12 @@ export default function ClientLayout({
         <Link href="/" prefetch={true}>
           About
         </Link>
-        <Link href="/works">Works</Link>
-        <Link href="/contact">Contact</Link>
+        <Link href="/works" prefetch={true}>
+          Works
+        </Link>
+        <Link href="/contact" prefetch={true}>
+          Contact
+        </Link>
       </div>
       <style jsx global>{`
         .transition-group {
@@ -181,7 +177,7 @@ export default function ClientLayout({
           appear
           timeout={duration}
           onEnter={(dom: HTMLElement) => {
-            setEnterWidth((dom.childNodes[0] as HTMLElement).offsetWidth);
+            setEnterWidth((dom.childNodes[0] as HTMLElement)?.offsetWidth);
           }}
           mountOnEnter
           unmountOnExit
