@@ -11,8 +11,9 @@ const Work: React.FC<{ params: { slug: string } }> = ({ params }) => {
 
   return (
     <div>
-      {post?.date}
-      {post?.body.raw}
+      <div>{post?.date}</div>
+      <div>{post?.title}</div>
+      <div>{post?.body.raw}</div>
       {/* <div>{JSON.stringify(allPosts)}</div> */}
     </div>
   );

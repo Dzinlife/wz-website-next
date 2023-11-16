@@ -119,8 +119,8 @@ export default function ClientLayout({
       </div>
       <style jsx global>{`
         .transition-group {
-          position: relative;
-          width: 100%;
+          ${layout === "landscape" ? "margin-top: 40px;" : ""}
+          ${layout === "portrait" ? "margin-top: 16px;" : ""}
           & > *[class^="page-transition-"] {
             &:not(.page-transition-enter-done) {
               position: absolute;

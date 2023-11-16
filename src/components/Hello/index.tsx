@@ -69,6 +69,10 @@ const Hello: React.FC = () => {
   return (
     <>
       <style jsx>{`
+        .use-color-blend {
+          ${layout === "portrait" && "mix-blend-mode: difference;"}
+        }
+
         .use-color-scheme {
           transition: color 3000ms ease, border-color 3000ms ease;
         }
@@ -80,17 +84,21 @@ const Hello: React.FC = () => {
         }
       `}</style>
       <div
-        className={classNames("uppercase whitespace-nowrap", {
+        className={classNames("uppercase whitespace-nowrap ", {
           hidden: !layout,
         })}
-        style={{ fontFamily: "NeoSans", fontSize: helloWidth / 512, color }}
+        style={{
+          fontFamily: "NeoSans",
+          fontSize: helloWidth / 512,
+          color: layout === "portrait" ? "white" : color,
+        }}
       >
-        <div className="text-[175em] indent-[-0.07em] leading-[0.85em]">
+        <div className="use-color-blend text-[175em] indent-[-0.07em] leading-[0.85em]">
           Hello
         </div>
         <div>
           <div>
-            <span className="text-[32em]">This is</span>
+            <span className="use-color-blend text-[32em]">This is</span>
             <span
               className="use-color-scheme text-[66em] leading-[1.6em]"
               style={{ color: colorScheme[0] }}
@@ -100,7 +108,7 @@ const Hello: React.FC = () => {
             </span>
           </div>
           <div>
-            <span className="text-[33em]">A</span>
+            <span className="use-color-blend text-[33em]">A</span>
             <span
               className="use-color-scheme text-[83.6em] leading-[1.1em]"
               style={{ color: colorScheme[1] }}
@@ -110,7 +118,7 @@ const Hello: React.FC = () => {
             </span>
           </div>
           <div>
-            <span className="text-[32em]">And</span>
+            <span className="use-color-blend text-[32em]">And</span>
             <span
               className="use-color-scheme text-[89em] leading-[1.3em] "
               style={{ color: colorScheme[2] }}
@@ -120,7 +128,7 @@ const Hello: React.FC = () => {
             </span>
           </div>
           <div>
-            <span className="text-[31em]">Based in</span>
+            <span className="use-color-blend text-[31em]">Based in</span>
             <span
               className="use-color-scheme text-[70em] leading-[1.2em] "
               style={{ color: colorScheme[3] }}
@@ -130,7 +138,7 @@ const Hello: React.FC = () => {
             </span>
           </div>
           <div>
-            <span className="text-[32em]">Free free to</span>
+            <span className="use-color-blend text-[32em]">Free free to</span>
 
             <Link href="/contact">
               <span style={{ fontSize: "65em", lineHeight: "1.3em" }}>

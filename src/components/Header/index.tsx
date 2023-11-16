@@ -356,9 +356,9 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={classNames("relative mix-blend-difference", {
-        "h-[230px] pt-[80px]": layout === "landscape",
-        "h-[260px] pt-[110px]": layout === "portrait",
+      className={classNames("relative mix-blend-difference h-200 ", {
+        "mt-16": layout === "landscape",
+        "mt-28": layout === "portrait",
       })}
     >
       <div ref={canvasWrapperRef}></div>
@@ -368,7 +368,7 @@ const Header: React.FC = () => {
         className={classNames("cursor-pointer z-10", {
           hidden: !layout,
           "fixed top-[100px] left-16": layout === "landscape",
-          "absolute inset-0 m-auto -top-[110px]": layout === "portrait",
+          "absolute inset-0 m-auto -top-[180px]": layout === "portrait",
         })}
         onClick={() => {
           router.push("/");
@@ -383,7 +383,7 @@ const Header: React.FC = () => {
           font-size: 16px;
         }
       `}</style>
-      <svg className="w-full absolute bottom-[36px] left-0 font-[Mark] font-bold text-[13px]">
+      <svg className="w-full absolute bottom-0 left-0 font-[Mark] font-bold text-[13px]">
         <defs>
           <path id={svgPathId} d={svgCurvePath}></path>
         </defs>
