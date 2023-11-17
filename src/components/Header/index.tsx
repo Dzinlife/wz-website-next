@@ -7,6 +7,7 @@ import {
   useState,
   useMemo,
   useId,
+  useTransition,
 } from "react";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { useAsyncMemo } from "@/utils/useAsyncMemo";
@@ -398,7 +399,6 @@ const Header: React.FC = () => {
             className="cursor-pointer"
             key={i}
             onClick={(e) => {
-              e.preventDefault();
               router.push(tab.href);
             }}
           >

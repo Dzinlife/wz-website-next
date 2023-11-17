@@ -11,8 +11,6 @@ import {
 } from "next/navigation";
 import { LayoutRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useLayout } from "@/utils/useLayout";
-//@ts-ignore
-import wcmatch from "wildcard-match";
 
 const FrozenRouter: React.FC<React.PropsWithChildren> = (props) => {
   const context = useContext(LayoutRouterContext);
@@ -49,7 +47,7 @@ export default function ClientLayout({
   });
 
   if (routeRef.current.currentPath !== pathname) {
-    const prevPath = routeRef.current.currentRoute;
+    const prevPath = routeRef.current.currentPath;
     const prevRoute = routeRef.current.currentRoute;
     const prevRoutes = routeRef.current.currentRoutes;
 
@@ -65,19 +63,17 @@ export default function ClientLayout({
 
   const prevPath = routeRef.current.prevPath;
 
-  const rules = useMemo(() => ["", "works", "works/*", "contact"], []);
+  const rules = useMemo(() => ["/$", "/works$", "/works/.*$", "/contact$"], []);
 
   const direction = useMemo(() => {
     if (prevPath === undefined) return 0;
 
-    if (routes.length > 1) return 1;
-
-    return rules.findIndex((rule) => wcmatch(rule)(route)) -
-      rules.findIndex((rule) => wcmatch(rule)(prevPath)) >
+    return rules.findIndex((rule) => new RegExp(rule).test(pathname)) -
+      rules.findIndex((rule) => new RegExp(rule).test(prevPath)) >
       0
       ? 1
       : -1;
-  }, [rules, route, routes, prevPath]);
+  }, [rules, pathname, prevPath]);
 
   const prevOffsetCenterRef = useRef<typeof offsetCenter | undefined>(
     undefined
@@ -117,7 +113,7 @@ export default function ClientLayout({
         .transition-group {
           ${layout === "landscape" ? "margin-top: 40px;" : ""}
           ${layout === "portrait" ? "margin-top: 16px;" : ""}
-          & > *[class^="page-transition-"] {
+          & > *[class^="page-transition-"], & > *[class*=" page-transition-"] {
             &:not(.page-transition-enter-done) {
               position: absolute;
               width: 100%;

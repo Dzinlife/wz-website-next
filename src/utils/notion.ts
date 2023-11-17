@@ -30,6 +30,8 @@ export const fetchPages = React.cache(() => {
 });
 
 export const fetchPageBySlug = React.cache((slug: string) => {
+  if (!slug) return undefined;
+
   return notion.databases
     .query({
       database_id: process.env.NOTION_DATABASE_ID!,
@@ -41,16 +43,15 @@ export const fetchPageBySlug = React.cache((slug: string) => {
       },
     })
     .then((res) => {
-      console.log(1211111, res.results[0].id);
       return res.results[0] as PageObjectResponse | undefined;
     });
 });
 
-// export const fetchRecordsByPageId = React.cache(async (id: string) => {
-//   return (await notionCompat.getPage(id)) as React.ComponentProps<
-//     typeof NotionRenderer
-//   >["recordMap"];
-// });
+export const fetchRecordsByPageId = React.cache(async (id: string) => {
+  return (await notionCompat.getPage(id)) as React.ComponentProps<
+    typeof NotionRenderer
+  >["recordMap"];
+});
 
 export const fetchPageBlocks = React.cache((pageId: string) => {
   return notion.blocks.children
