@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useSpring } from "@/utils/useSpring";
-import { RequestManager } from "@/utils/requestManager";
+import { useTick } from "@/utils/useTick";
 import classNames from "classnames";
 
 const Magnification: React.FC<
@@ -96,7 +96,7 @@ const Magnification: React.FC<
 
   const mouseRef = useRef<{ x: number; y: number }>();
 
-  const scaleRef = useRef(zoom - 1);
+  const scaleRef = useRef(0);
   const [scales, setScales] = useState(Array(n).fill(0));
   const [translates, setTranslates] = useState(Array(n).fill(0));
 
@@ -137,22 +137,26 @@ const Magnification: React.FC<
     setTranslates(translates);
   }, [calc, n, cellWidth, direction, cellHeight]);
 
-  const requestManagerRef = useRef(RequestManager());
+  const tick = useTick();
 
   const mouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     mouseRef.current = {
       x: e.clientX,
       y: e.clientY,
     };
-    requestManagerRef.current.tick(update);
+    tick(update);
   };
 
-  const transitionSpring = useSpring<number>(scaleRef.current, {
-    onUpdate: (v) => {
-      scaleRef.current = v;
-      requestManagerRef.current.tick(update);
+  const transitionSpring = useSpring<number>(
+    scaleRef.current,
+    {
+      onUpdate: (v) => {
+        scaleRef.current = v;
+        tick(update);
+      },
     },
-  });
+    [update]
+  );
 
   const mouseEnter = () => {
     transitionSpring.transitionTo(zoom - 1);
@@ -179,10 +183,11 @@ const Magnification: React.FC<
           <div
             className={classNames({}, cellClassName)}
             style={{
-              display: direction === "horizontal" ? "inline-block" : "block",
+              display: direction === "horizontal" ? "inline-flex" : "flex",
               width: cellWidth,
               height: cellHeight,
               transformOrigin: origin,
+              verticalAlign: "top",
               transform: `translate(${
                 direction === "horizontal" ? `${translates[i] * 100}%` : "0"
               },${

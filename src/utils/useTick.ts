@@ -1,9 +1,12 @@
-export const RequestManager = () => {
-  const callbacks: Function[] = [];
+import { DependencyList } from "react";
+
+const callbacks: Function[] = [];
+
+export const useTick = (deps: DependencyList = []) => {
   let isRunning = false;
 
-  const tick = (callback: Function) => {
-    !callbacks.includes(callback) && callbacks.push(callback);
+  const tick = (fn: Function) => {
+    !callbacks.includes(fn) && callbacks.push(fn);
 
     if (callbacks.length && !isRunning) {
       isRunning = true;
@@ -15,7 +18,5 @@ export const RequestManager = () => {
     }
   };
 
-  return {
-    tick,
-  };
+  return tick;
 };
