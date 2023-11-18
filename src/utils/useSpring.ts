@@ -85,34 +85,43 @@ const Spring = <
       positions = endPositions =
         v !== undefined ? (Array.isArray(v) ? v.slice() : [v]) : [];
       config.onUpdate(positions as V);
+      return instance;
     },
     getValue: (): V => {
       return (Array.isArray(initialPosition) ? positions : positions[0]) as V;
     },
     transitionTo: (v?: U) => {
-      if (v === undefined) return;
+      if (v === undefined) return instance;
 
       if (!positions.length) {
         positions = v !== undefined ? (Array.isArray(v) ? v.slice() : [v]) : [];
-        return;
+        return instance;
       }
 
       cancelAnimationFrame(raf);
       endPositions =
         v !== undefined ? (Array.isArray(v) ? v.slice() : [v]) : [];
-      raf = requestAnimationFrame(interpolate);
+
+      if (endPositions.some((n, i) => n !== positions[i])) {
+        raf = requestAnimationFrame(interpolate);
+      }
+
+      return instance;
     },
     onUpdate: (fn = (v?: V) => {}, options?: { immediate?: boolean }) => {
       if (isMuted) return;
       config.onUpdate = fn;
       options?.immediate && fn(positions as V);
+      return instance;
     },
     onRest: (fn = (v?: V) => {}) => {
       config.onRest = fn;
+      return instance;
     },
     destroy: () => {},
     setConfig: (newConfig: Partial<typeof config>) => {
       Object.assign(config, newConfig);
+      return instance;
     },
   };
 
@@ -146,13 +155,16 @@ export const useSpring = <T extends number | number[] | undefined>(
 ) => {
   const instanceRef = useRef(Spring(initialValue, options));
 
+  const initialRef = useRef(true);
+
   useEffect(() => {
-    const instance = Spring(initialValue, options);
-
-    instanceRef.current = instance;
-
+    if (initialRef.current) {
+      initialRef.current = false;
+    } else {
+      instanceRef.current = Spring(initialValue, options);
+    }
     return () => {
-      instance.destroy();
+      instanceRef.current.destroy();
     };
   }, [...deps]);
 

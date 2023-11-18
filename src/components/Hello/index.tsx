@@ -79,10 +79,12 @@ const Hello: React.FC = () => {
     }
 
     const timer = setTimeout(() => {
-      helloSpring.transitionTo(1);
-      helloSpring.onUpdate((value) => {
-        setHelloOpacity(value ?? 0);
-      });
+      helloSpring
+        .setValue(helloOpacity)
+        .transitionTo(1)
+        .onUpdate((value) => {
+          setHelloOpacity(value ?? 0);
+        });
     }, 700);
 
     return () => {
