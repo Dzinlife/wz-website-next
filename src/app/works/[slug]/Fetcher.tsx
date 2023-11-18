@@ -1,4 +1,4 @@
-import { fetchPageBySlug, fetchRecordsByPageId } from "@/utils/notion";
+import { fetchPageBySlug, fetchRecordsByPageId } from "@/actions/notion";
 import { notFound } from "next/navigation";
 import Renderer from "./Renderer";
 

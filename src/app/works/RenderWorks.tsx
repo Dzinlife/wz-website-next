@@ -1,5 +1,4 @@
-import { fetchPages } from "@/utils/notion";
-import { allPosts, Post } from "contentlayer/generated";
+import { fetchPages } from "@/actions/notion";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";

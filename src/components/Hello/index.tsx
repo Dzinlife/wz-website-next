@@ -1,8 +1,9 @@
+import Spring, { useSpring } from "@/utils/useSpring";
 import { useLayout } from "@/utils/useLayout";
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 
 const Hello: React.FC = () => {
   const { helloWidth, layout } = useLayout();
@@ -66,10 +67,35 @@ const Hello: React.FC = () => {
     };
   }, []);
 
+  const [helloOpacity, setHelloOpacity] = useState(0);
+
+  const helloSpring = useSpring(helloOpacity);
+
+  useEffect(() => {
+    if (!layout) return;
+    if (layout === "landscape") {
+      setHelloOpacity(1);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      helloSpring.transitionTo(1);
+      helloSpring.onUpdate((value) => {
+        setHelloOpacity(value ?? 0);
+      });
+    }, 700);
+
+    return () => {
+      helloSpring.destroy();
+      clearTimeout(timer);
+    };
+  }, [layout]);
+
   return (
     <>
       <style jsx>{`
         .use-color-blend {
+          opacity: ${helloOpacity};
           ${layout === "portrait" && "mix-blend-mode: difference;"}
         }
 

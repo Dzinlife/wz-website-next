@@ -10,7 +10,7 @@ export const useLayout = (outterWidth?: number) => {
 
   const [width, height] = (() => {
     if (typeof window === "undefined") return [0, 0];
-    return [window.innerWidth, window.innerHeight];
+    return [window.outerWidth, window.outerHeight];
   })();
 
   if (outterWidth === undefined) {

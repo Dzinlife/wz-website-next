@@ -12,7 +12,7 @@ import {
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { useAsyncMemo } from "@/utils/useAsyncMemo";
 import FontFaceObserver from "fontfaceobserver";
-import Spring from "@/utils/tinySpring";
+import { useSpring } from "@/utils/useSpring";
 import { useLayout } from "@/utils/useLayout";
 import Wz from "./Wz";
 import classNames from "classnames";
@@ -293,11 +293,9 @@ const Header: React.FC = () => {
     [calcSegmentLength]
   );
 
-  const springLeftRef = useRef(Spring<number>());
-  const springRightRef = useRef(Spring<number>());
-  const springCenterRef = useRef(
-    Spring<number[]>([], { stiffness: 200, damping: 20 })
-  );
+  const springLeft = useSpring<number>();
+  const springRight = useSpring<number>();
+  const springCenter = useSpring([]);
 
   useEffect(() => {
     const { offset, textWidth } = currentTab || {};
@@ -305,40 +303,45 @@ const Header: React.FC = () => {
     const offsetLeft = offset ? offset - currentTab.textWidth / 2 : offset;
     const offsetRight = offsetLeft ? offsetLeft + textWidth : offsetLeft;
 
-    springLeftRef.current.transitionTo(offsetLeft);
-    springRightRef.current.transitionTo(offsetRight);
-    springCenterRef.current.transitionTo(
-      tabsWithOffset?.map((n) => n.offset) || []
-    );
+    springLeft.transitionTo(offsetLeft);
+    springRight.transitionTo(offsetRight);
+    springCenter.transitionTo(tabsWithOffset?.map((n) => n.offset) || []);
 
     switch (direction) {
       case 1: {
-        springLeftRef.current.setConfig({ stiffness: 90, damping: 20 });
-        springRightRef.current.setConfig({ stiffness: 120, damping: 20 });
+        springLeft.setConfig({ stiffness: 90, damping: 20 });
+        springRight.setConfig({ stiffness: 120, damping: 20 });
         break;
       }
       case -1: {
-        springLeftRef.current.setConfig({ stiffness: 120, damping: 20 });
-        springRightRef.current.setConfig({ stiffness: 90, damping: 20 });
+        springLeft.setConfig({ stiffness: 120, damping: 20 });
+        springRight.setConfig({ stiffness: 90, damping: 20 });
         break;
       }
       case 0: {
-        springLeftRef.current.setConfig({ stiffness: 200, damping: 20 });
-        springRightRef.current.setConfig({ stiffness: 200, damping: 20 });
+        springLeft.setConfig({ stiffness: 200, damping: 20 });
+        springRight.setConfig({ stiffness: 200, damping: 20 });
         break;
       }
     }
-  }, [currentTab, direction, tabsWithOffset]);
+  }, [
+    currentTab,
+    direction,
+    tabsWithOffset,
+    springLeft,
+    springRight,
+    springCenter,
+  ]);
 
-  const textOffset = springCenterRef.current.getValue();
+  const textOffset = springCenter.getValue();
 
   const rectOffset = textOffset.map((textOffset, i) => {
     return textOffset - curveLength / 2 - 40;
   });
 
   const underlineCurvePath = useMemo(() => {
-    const left = springLeftRef.current.getValue();
-    const right = springRightRef.current.getValue();
+    const left = springLeft.getValue();
+    const right = springRight.getValue();
 
     if (!left || !right) return "";
 
