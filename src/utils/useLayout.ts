@@ -1,5 +1,6 @@
+import { ContentBodyContext } from "@/app/clientLayout";
 import { useSelectedLayoutSegment } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 
 export const useLayout = (outterWidth?: number) => {
   const [layout, setLayout] = useState<"landscape" | "portrait">();
@@ -50,13 +51,13 @@ export const useLayout = (outterWidth?: number) => {
     };
   }, []);
 
-  const helloWidth = useMemo(() => {
+  const minWidth = useMemo(() => {
     if (!layout) return 0;
     const bottleneck = width > 512 ? 512 : width;
     return bottleneck * 0.72;
   }, [width, layout]);
 
-  let offsetLeft = (outterWidth - helloWidth) / 2;
+  let offsetLeft = (outterWidth - minWidth) / 2;
 
   let offsetCenter = 0;
 
@@ -71,10 +72,30 @@ export const useLayout = (outterWidth?: number) => {
 
   offsetLeft += offsetCenter;
 
+  const bodyDiv = use(ContentBodyContext);
+
+  const [minHeight, setMinHeight] = useState(0);
+
+  useEffect(() => {
+    if (!bodyDiv) return;
+
+    const observer = new ResizeObserver((entries) => {
+      const { height } = entries[0].contentRect;
+      setMinHeight(height - 200);
+    });
+
+    observer.observe(bodyDiv);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [bodyDiv]);
+
   return {
     layout,
     offsetLeft,
-    helloWidth,
     offsetCenter,
+    minWidth,
+    minHeight,
   };
 };

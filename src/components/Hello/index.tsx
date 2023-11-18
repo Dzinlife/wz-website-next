@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { use, useEffect, useMemo, useRef, useState } from "react";
 
 const Hello: React.FC = () => {
-  const { helloWidth, layout } = useLayout();
+  const { minWidth, layout } = useLayout();
 
   const color = useMemo(() => {
     switch (layout) {
@@ -115,7 +115,7 @@ const Hello: React.FC = () => {
         })}
         style={{
           fontFamily: "NeoSans",
-          fontSize: helloWidth / 512,
+          fontSize: minWidth / 512,
           color: layout === "portrait" ? "white" : color,
         }}
       >

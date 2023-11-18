@@ -56,7 +56,7 @@ const Header: React.FC = () => {
     }, 0);
   }, [curve, calcSegmentLength]);
 
-  const { layout, offsetLeft, helloWidth } = useLayout(curveLength);
+  const { layout, offsetLeft, minWidth } = useLayout(curveLength);
 
   const [headerColor, setHeaderColor] = useState<"white" | "black">("white");
 
@@ -153,15 +153,14 @@ const Header: React.FC = () => {
       0
     );
 
-    const tabGap =
-      (helloWidth - totalTextWidth) / (tabsWithTextWidth.length - 1);
+    const tabGap = (minWidth - totalTextWidth) / (tabsWithTextWidth.length - 1);
 
     return {
       tabsWithTextWidth,
       tabGap: Math.max(MIN, tabGap),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [helloWidth, tabs, fontLoaded]);
+  }, [minWidth, tabs, fontLoaded]);
 
   const tabsWithOffset = useMemo(() => {
     if (!curveLength) return;

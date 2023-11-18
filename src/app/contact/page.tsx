@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import { ContentBodyContext } from "../clientLayout";
 import Magnification from "@/components/Magnification";
+import { useLayout } from "@/utils/useLayout";
 
 const Twitter: React.FC = () => {
   return (
@@ -32,25 +33,7 @@ const Instagram: React.FC = () => {
 };
 
 const Contact: React.FC = () => {
-  const bodyDiv = use(ContentBodyContext);
-
-  const [minHeight, setMinHeight] = useState(0);
-
-  useEffect(() => {
-    if (!bodyDiv) return;
-
-    const observer = new ResizeObserver((entries) => {
-      const { height } = entries[0].contentRect;
-      setMinHeight(height - 200);
-    });
-
-    observer.observe(bodyDiv);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [bodyDiv]);
-
+  const { minHeight } = useLayout();
   return (
     <div
       className="w-96  box-content mx-auto text-center flex flex-col justify-center items-center"

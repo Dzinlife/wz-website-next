@@ -154,7 +154,7 @@ export const useSpring = <T extends number | number[] | undefined>(
     return () => {
       instance.destroy();
     };
-  }, deps);
+  }, [...deps]);
 
   return instanceRef.current;
 };

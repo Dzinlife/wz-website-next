@@ -29,7 +29,7 @@ const Me: React.FC<{ className?: string; style?: React.CSSProperties }> = ({
 };
 
 export default function Home() {
-  const { layout, offsetLeft, helloWidth } = useLayout();
+  const { layout, offsetLeft, minWidth, minHeight } = useLayout();
 
   const pathname = usePathname();
 
@@ -59,11 +59,14 @@ export default function Home() {
           )
         : null}
       <div
-        className={classNames("w-[512px] z-20 flex flex-1 items-center pb-24")}
+        className={classNames(
+          "w-[512px] z-20 flex flex-1 items-center  justify-center"
+        )}
         style={
           layout && {
             marginLeft: offsetLeft,
-            width: helloWidth,
+            width: minWidth,
+            minHeight,
           }
         }
       >

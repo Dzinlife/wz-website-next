@@ -1,22 +1,52 @@
-import { DependencyList } from "react";
+import { DependencyList, useEffect } from "react";
 
-const callbacks: Function[] = [];
+const callbacksMap = new Map<Function, number>();
+let isRunning = false;
 
 export const useTick = (deps: DependencyList = []) => {
-  let isRunning = false;
+  const innerCallbacks: Function[] = [];
 
   const tick = (fn: Function) => {
-    !callbacks.includes(fn) && callbacks.push(fn);
+    innerCallbacks.push(fn);
 
-    if (callbacks.length && !isRunning) {
+    const exist = callbacksMap.get(fn);
+
+    if (!exist) {
+      callbacksMap.set(fn, 1);
+    } else {
+      callbacksMap.set(fn, exist + 1);
+    }
+
+    callbacksMap.size;
+
+    if (callbacksMap.size && !isRunning) {
       isRunning = true;
       requestAnimationFrame(() => {
-        callbacks.forEach((callback) => callback());
-        callbacks.length = 0;
+        Array.from(callbacksMap.keys()).forEach((callback) => callback());
+        callbacksMap.clear();
+        innerCallbacks.length = 0;
         isRunning = false;
       });
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (innerCallbacks.length) {
+        innerCallbacks.forEach((fn) => {
+          const num = callbacksMap.get(fn);
+          if (!num) return;
+          if (num === 1) {
+            callbacksMap.delete(fn);
+          }
+          if (num > 1) {
+            callbacksMap.set(fn, num - 1);
+          }
+        });
+        innerCallbacks.length = 0;
+      }
+    };
+  }, [...deps]);
 
   return tick;
 };
