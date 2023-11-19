@@ -1,10 +1,11 @@
 import { Suspense, use } from "react";
 import RenderWorks from "./RenderWorks";
+import LoadingPage from "@/components/LoadingPage";
 
 const Works: React.FC = async () => {
   return (
-    <div className="w-96 mx-auto">
-      <Suspense fallback={<div>loading</div>}>
+    <div className="max-w-[800px] px-8 box-content mx-auto">
+      <Suspense fallback={<LoadingPage />}>
         <RenderWorks />
       </Suspense>
     </div>

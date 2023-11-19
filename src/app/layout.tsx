@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import ClientLayout from "./clientLayout";
+import ClientLayout from "./ClientLayout";
 import classNames from "classnames";
 import { Inter } from "next/font/google";
 

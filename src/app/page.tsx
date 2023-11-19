@@ -41,7 +41,7 @@ export default function Home() {
               in={pathname === "/"}
               appear
               exit={true}
-              timeout={700}
+              timeout={400}
               classNames="page-transition"
               mountOnEnter
               unmountOnExit

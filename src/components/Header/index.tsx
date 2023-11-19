@@ -374,7 +374,9 @@ const Header: React.FC = () => {
           "absolute inset-0 m-auto -top-[180px]": layout === "portrait",
         })}
         onClick={() => {
-          router.push("/");
+          router.push("/", {
+            scroll: false,
+          });
         }}
       />
       <style jsx>{`
@@ -401,7 +403,9 @@ const Header: React.FC = () => {
             className="cursor-pointer"
             key={i}
             onClick={(e) => {
-              router.push(tab.href);
+              router.push(tab.href, {
+                scroll: false,
+              });
             }}
           >
             <rect

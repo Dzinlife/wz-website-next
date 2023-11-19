@@ -85,7 +85,7 @@ const Hello: React.FC = () => {
         .onUpdate((value) => {
           setHelloOpacity(value ?? 0);
         });
-    }, 700);
+    }, 400);
 
     return () => {
       helloSpring.destroy();

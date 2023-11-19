@@ -5,13 +5,12 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   module.exports = withBundleAnalyzer({
     staticPageGenerationTimeout: 3000,
     images: {
-      domains: [
-        'www.notion.so',
-        'notion.so',
-        'images.unsplash.com',
-        'pbs.twimg.com'
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: '*',
+        },
       ],
-      formats: ['image/avif', 'image/webp']
     }
   })
   

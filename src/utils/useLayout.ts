@@ -1,4 +1,4 @@
-import { ContentBodyContext } from "@/app/clientLayout";
+import { ContentBodyContext } from "@/app/ClientLayout";
 import { useSelectedLayoutSegment } from "next/navigation";
 import { use, useEffect, useMemo, useState } from "react";
 
@@ -77,6 +77,7 @@ export const useLayout = (outterWidth?: number) => {
   const [minHeight, setMinHeight] = useState(0);
 
   useEffect(() => {
+    console.log(bodyDiv);
     if (!bodyDiv) return;
 
     const observer = new ResizeObserver((entries) => {

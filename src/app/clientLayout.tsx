@@ -2,11 +2,10 @@
 
 import Header from "@/components/Header";
 import Link from "next/link";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 import React, {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -38,9 +37,9 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const duration = 700;
+  const duration = 300;
 
-  const { layout, offsetCenter } = useLayout();
+  const { layout } = useLayout();
 
   const pathname = usePathname();
 
@@ -85,40 +84,13 @@ export default function ClientLayout({
       : -1;
   }, [rules, pathname, prevPath]);
 
-  const prevOffsetCenterRef = useRef<typeof offsetCenter | undefined>(
-    undefined
-  );
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    setTimeout(() => {
-      prevOffsetCenterRef.current = offsetCenter;
-    });
-  }, [offsetCenter]);
-
-  const [enterWidth, setEnterWidth] = useState(0);
-
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const content = contentRef.current;
-    if (!content) return;
-
-    const observer = new ResizeObserver(() => {});
-
-    observer.observe(content);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  const [, update] = useState({});
 
   if (!layout) return null;
 
-  let pageTransitionOffset = enterWidth + 80;
-  if (routeRef.current.prevRoute === "")
-    pageTransitionOffset += prevOffsetCenterRef.current ?? 0;
-
-  if (route === "") pageTransitionOffset += 60;
+  let pageTransitionOffset = "50%";
 
   return (
     <>
@@ -139,15 +111,19 @@ export default function ClientLayout({
           "mt-[40px]": layout === "landscape",
           "mt-[16px]": layout === "portrait",
         })}
-        ref={contentRef}
+        ref={(ref) => {
+          if (!contentRef.current) {
+            contentRef.current = ref;
+            update({});
+          }
+        }}
       >
         <style jsx global>{`
           .transition-group {
             & > *[class^="page-transition-"],
             & > *[class*=" page-transition-"] {
               &:not(.page-transition-enter-done) {
-                position: absolute;
-                width: 100%;
+                // position: absolute;
               }
             }
           }
@@ -156,10 +132,10 @@ export default function ClientLayout({
           .page-transition-appear {
             opacity: 0;
             ${direction < 0
-              ? `transform: translate3d(-${pageTransitionOffset}px, 0, 0);`
+              ? `transform: translate3d(-${pageTransitionOffset}, 0, 0);`
               : ""}
             ${direction > 0
-              ? `transform: translate3d(${pageTransitionOffset}px, 0, 0);`
+              ? `transform: translate3d(${pageTransitionOffset}, 0, 0);`
               : ""}
           }
           .page-transition-appear-active {
@@ -170,10 +146,10 @@ export default function ClientLayout({
           .page-transition-enter {
             opacity: 0;
             ${direction < 0
-              ? `transform: translate3d(-${pageTransitionOffset}px, 0, 0);`
+              ? `transform: translate3d(-${pageTransitionOffset}, 0, 0);`
               : ""}
             ${direction > 0
-              ? `transform: translate3d(${pageTransitionOffset}px, 0, 0);`
+              ? `transform: translate3d(${pageTransitionOffset}, 0, 0);`
               : ""}
           }
           .page-transition-enter-active {
@@ -184,38 +160,46 @@ export default function ClientLayout({
           .page-transition-exit {
             opacity: 1;
             transform: translate3d(0, 0, 0);
-            transition: ${duration}ms ease;
+            transition: ${duration}ms ease-in;
           }
 
           .page-transition-exit-active {
             opacity: 0;
             ${direction < 0
-              ? `transform: translate3d(${pageTransitionOffset}px, 0, 0);`
+              ? `transform: translate3d(${pageTransitionOffset}, 0, 0);`
               : ""}
             ${direction > 0
-              ? `transform: translate3d(-${pageTransitionOffset}px, 0, 0);`
+              ? `transform: translate3d(-${pageTransitionOffset}, 0, 0);`
               : ""}
           }
         `}</style>
 
         <ContentBodyContext.Provider value={contentRef.current}>
-          <TransitionGroup className="transition-group">
+          <SwitchTransition mode="out-in">
             <CSSTransition
-              in={true}
-              exit={true}
               appear
-              timeout={duration}
-              onEnter={(dom: HTMLElement) => {
-                setEnterWidth((dom.childNodes[0] as HTMLElement)?.offsetWidth);
-              }}
-              mountOnEnter
               unmountOnExit
+              addEndListener={(node, done) => {
+                if (node.classList.contains("page-transition-exit")) {
+                  node.style.opacity = "0";
+                }
+
+                if (node.classList.contains("page-transition-appear")) {
+                  node.style.opacity = "0";
+                  setTimeout(() => {
+                    node.style.opacity = "";
+                  });
+                }
+
+                node.addEventListener("transitionend", done, false);
+              }}
+              timeout={duration}
               classNames="page-transition"
               key={pathname}
             >
               <FrozenRouter>{children}</FrozenRouter>
             </CSSTransition>
-          </TransitionGroup>
+          </SwitchTransition>
         </ContentBodyContext.Provider>
       </div>
     </>
