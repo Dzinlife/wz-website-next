@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import spin from "../../assets/ring-resize.svg";
+import spin from "@/assets/ring-resize.svg";
 import Image from "next/image";
 import classNames from "classnames";
+import { useLayout } from "@/utils/useLayout";
 
 const LoadingImage: React.FC<{
   src: string;

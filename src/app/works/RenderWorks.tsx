@@ -1,7 +1,7 @@
 import { fetchPages } from "@/actions/notion";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import LoadingImage from "@/components/LoadingImage";
+import LoadingImage from "./LoadingImage";
 
 const Works: React.FC = async () => {
   const pages = await fetchPages();
@@ -12,11 +12,10 @@ const Works: React.FC = async () => {
     <>
       {pages.results.map((post: any) => {
         return (
-          <div key={post.id} className="mb-28 group">
+          <div key={post.id} className="group mb-[12%]">
             <Link
               href={`/works/${post.properties.Slug.rich_text[0].plain_text}`}
               scroll={false}
-              prefetch={true}
             >
               <div className="transition-opacity text-lg leading-8 font-bold font-[Mark] group-hover:opacity-100">
                 {post.properties.Title.title[0].plain_text}

@@ -9,7 +9,11 @@ import {
   useId,
   useTransition,
 } from "react";
-import { useRouter, useSelectedLayoutSegment } from "next/navigation";
+import {
+  useRouter,
+  useSelectedLayoutSegment,
+  useSelectedLayoutSegments,
+} from "next/navigation";
 import { useAsyncMemo } from "@/utils/useAsyncMemo";
 import FontFaceObserver from "fontfaceobserver";
 import { useSpring } from "@/utils/useSpring";
@@ -21,6 +25,7 @@ const Header: React.FC = () => {
   const dotSeaRef = useRef<ReturnType<typeof createDotSea>>(null!);
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
   const route = useSelectedLayoutSegment();
+  const routes = useSelectedLayoutSegments();
 
   const [curve, setCurve] = useState<[number, number][]>([]);
 
@@ -346,7 +351,7 @@ const Header: React.FC = () => {
 
     const underlineCurve = splitCurve(curve, left, right);
     return getPathPropByCurve(underlineCurve.map((p) => ((p[1] += 4), p)));
-  }, [curve, getPathPropByCurve, splitCurve]);
+  }, [curve, getPathPropByCurve, splitCurve, springLeft, springRight]);
 
   const svgPathId = useId();
 
@@ -405,20 +410,14 @@ const Header: React.FC = () => {
           }
         }}
       />
-      <style jsx>{`
-        text {
-          transition: 0.07s ease-out;
-        }
-        rect:hover + text:not(.focus),
-        text:not(.focus):hover {
-          font-size: 16px;
-        }
-      `}</style>
       <svg className="w-full absolute bottom-0 left-0 font-[Mark] font-bold text-[13px]">
         <defs>
           <path id={svgPathId} d={svgCurvePath}></path>
         </defs>
         <path
+          className={classNames("transition-opacity", {
+            "opacity-0": routes.length > 1,
+          })}
           d={underlineCurvePath}
           fill="transparent"
           strokeWidth="2"
@@ -426,7 +425,7 @@ const Header: React.FC = () => {
         />
         {tabsWithOffset?.map((tab, i) => (
           <g
-            className="cursor-pointer"
+            className="cursor-pointer group"
             key={i}
             onClick={(e) => {
               startTransition(() => {
@@ -445,8 +444,9 @@ const Header: React.FC = () => {
             <text
               fill={headerColor}
               textAnchor="middle"
-              className={classNames({
-                focus: currentTab === tab,
+              className={classNames("transition-all ", {
+                "group-hover:text-[16px]":
+                  currentTab !== tab || routes.length > 1,
               })}
             >
               <textPath xlinkHref={`#${svgPathId}`} startOffset={textOffset[i]}>

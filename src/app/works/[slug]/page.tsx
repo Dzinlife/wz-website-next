@@ -6,7 +6,7 @@ export const runtime = "edge";
 
 const Work: React.FC<{ params: { slug: string } }> = ({ params }) => {
   return (
-    <div className="w-96 mx-auto">
+    <div className="max-w-[800px] px-8 box-content mx-auto">
       <Suspense fallback={<LoadingPage />}>
         <Fetcher slug={params.slug} />
       </Suspense>
