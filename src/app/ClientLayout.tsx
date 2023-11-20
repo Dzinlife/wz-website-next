@@ -6,15 +6,12 @@ import { CSSTransition, SwitchTransition } from "react-transition-group";
 import React, {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import {
-  usePathname,
-  useSelectedLayoutSegment,
-  useSelectedLayoutSegments,
-} from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LayoutRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useLayout } from "@/utils/useLayout";
 import classNames from "classnames";
@@ -43,42 +40,56 @@ export default function ClientLayout({
 
   const pathname = usePathname();
 
-  const route = useSelectedLayoutSegment() || "";
-  const routes = useSelectedLayoutSegments();
-
   const routeRef = useRef({
     currentPath: pathname,
     prevPath: undefined as typeof pathname | undefined,
-    currentRoute: route,
-    prevRoute: undefined as typeof route | undefined,
-    currentRoutes: routes,
-    prevRoutes: undefined as typeof routes | undefined,
   });
 
   if (routeRef.current.currentPath !== pathname) {
     const prevPath = routeRef.current.currentPath;
-    const prevRoute = routeRef.current.currentRoute;
-    const prevRoutes = routeRef.current.currentRoutes;
 
     routeRef.current = {
       currentPath: pathname,
-      currentRoute: route,
-      currentRoutes: routes,
       prevPath,
-      prevRoute,
-      prevRoutes,
     };
   }
 
   const prevPath = routeRef.current.prevPath;
 
-  const rules = useMemo(() => ["/$", "/works$", "/works/.*$", "/contact$"], []);
+  const scrollRestorationRef = useRef(false);
+
+  useEffect(() => {
+    history.scrollRestoration = "manual";
+
+    const handler = () => {
+      scrollRestorationRef.current = true;
+    };
+    window.addEventListener("popstate", handler);
+
+    return () => {
+      window.removeEventListener("popstate", handler);
+    };
+  }, []);
+
+  const scrollRef = useRef(
+    typeof window === "undefined" ? [0, 0] : [window.scrollY, window.scrollY]
+  );
+
+  useEffect(() => {
+    scrollRef.current[0] = scrollRef.current[1];
+    scrollRef.current[1] = window.scrollY;
+  }, [pathname]);
+
+  const rules = useMemo(
+    () => [/^\/$/, /^\/works$/, /^\/works.*$/, /^\/contact$/],
+    []
+  );
 
   const direction = useMemo(() => {
     if (prevPath === undefined) return 0;
 
-    return rules.findIndex((rule) => new RegExp(rule).test(pathname)) -
-      rules.findIndex((rule) => new RegExp(rule).test(prevPath)) >
+    return rules.findIndex((rule) => rule.test(pathname)) -
+      rules.findIndex((rule) => rule.test(prevPath)) >
       0
       ? 1
       : -1;
@@ -107,9 +118,9 @@ export default function ClientLayout({
         </Link>
       </div>
       <div
-        className={classNames("flex-1", {
-          "mt-[40px]": layout === "landscape",
-          "mt-[16px]": layout === "portrait",
+        className={classNames("flex-1 pb-20", {
+          "pt-[40px]": layout === "landscape",
+          "pt-[16px]": layout === "portrait",
         })}
         ref={(ref) => {
           if (!contentRef.current) {
@@ -118,16 +129,6 @@ export default function ClientLayout({
           }
         }}
       >
-        <style jsx global>{`
-          .transition-group {
-            & > *[class^="page-transition-"],
-            & > *[class*=" page-transition-"] {
-              &:not(.page-transition-enter-done) {
-                // position: absolute;
-              }
-            }
-          }
-        `}</style>
         <style jsx global>{`
           .page-transition-appear {
             opacity: 0;
@@ -182,6 +183,14 @@ export default function ClientLayout({
               addEndListener={(node, done) => {
                 if (node.classList.contains("page-transition-exit")) {
                   node.style.opacity = "0";
+                }
+
+                if (node.classList.contains("page-transition-enter")) {
+                  if (scrollRestorationRef.current) {
+                    scrollRestorationRef.current = false;
+                    const y = scrollRef.current[0];
+                    window.scrollTo(0, y);
+                  }
                 }
 
                 if (node.classList.contains("page-transition-appear")) {

@@ -1,7 +1,5 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
-import { ContentBodyContext } from "../ClientLayout";
 import Magnification from "@/components/Magnification";
 import { useLayout } from "@/utils/useLayout";
 

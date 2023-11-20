@@ -357,10 +357,29 @@ const Header: React.FC = () => {
     return headerColor;
   }, [route, headerColor, layout]);
 
+  const [, startTransition] = useTransition();
+
+  const [isTop, setIsTop] = useState(true);
+
+  useEffect(() => {
+    const handler = () => {
+      if (window.scrollY <= 0) {
+        setIsTop(true);
+      } else {
+        setIsTop(false);
+      }
+    };
+    window.addEventListener("scroll", handler);
+
+    return () => {
+      window.removeEventListener("scroll", handler);
+    };
+  });
+
   return (
     <header
       className={classNames("relative mix-blend-difference h-200 ", {
-        "mt-16": layout === "landscape",
+        "mt-12": layout === "landscape",
         "mt-28": layout === "portrait",
       })}
     >
@@ -368,15 +387,22 @@ const Header: React.FC = () => {
       <Wz
         color={wzColor}
         height={28}
-        className={classNames("cursor-pointer z-10", {
+        className={classNames("z-10", {
           hidden: !layout,
-          "fixed top-[100px] left-16": layout === "landscape",
+          "fixed top-[72px] left-16": layout === "landscape",
           "absolute inset-0 m-auto -top-[180px]": layout === "portrait",
+          "cursor-pointer": isTop,
+          "cursor-n-resize": !isTop,
         })}
         onClick={() => {
-          router.push("/", {
-            scroll: false,
-          });
+          if (isTop) {
+            router.push("/");
+          } else {
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          }
         }}
       />
       <style jsx>{`
@@ -403,8 +429,8 @@ const Header: React.FC = () => {
             className="cursor-pointer"
             key={i}
             onClick={(e) => {
-              router.push(tab.href, {
-                scroll: false,
+              startTransition(() => {
+                router.push(tab.href);
               });
             }}
           >
@@ -419,7 +445,9 @@ const Header: React.FC = () => {
             <text
               fill={headerColor}
               textAnchor="middle"
-              className={currentTab === tab ? "focus" : ""}
+              className={classNames({
+                focus: currentTab === tab,
+              })}
             >
               <textPath xlinkHref={`#${svgPathId}`} startOffset={textOffset[i]}>
                 {tab.text}

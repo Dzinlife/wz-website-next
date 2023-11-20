@@ -26,6 +26,12 @@ export const fetchPages = React.cache(() => {
         equals: "Published",
       },
     },
+    sorts: [
+      {
+        property: "Date",
+        direction: "descending",
+      },
+    ],
   });
 });
 

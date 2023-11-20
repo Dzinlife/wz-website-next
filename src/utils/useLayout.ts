@@ -36,7 +36,9 @@ export const useLayout = (outterWidth?: number) => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const mediaQuery = window.matchMedia("(min-aspect-ratio: 4/3)");
+    const mediaQuery = window.matchMedia(
+      "(min-aspect-ratio: 4/3) and (min-width: 640px) and (min-height: 220px)"
+    );
 
     const handler = () => {
       setLayout(mediaQuery.matches ? "landscape" : "portrait");
@@ -77,12 +79,11 @@ export const useLayout = (outterWidth?: number) => {
   const [minHeight, setMinHeight] = useState(0);
 
   useEffect(() => {
-    console.log(bodyDiv);
     if (!bodyDiv) return;
 
     const observer = new ResizeObserver((entries) => {
       const { height } = entries[0].contentRect;
-      setMinHeight(height - 200);
+      setMinHeight(height - 100);
     });
 
     observer.observe(bodyDiv);

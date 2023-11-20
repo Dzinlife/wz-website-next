@@ -1,6 +1,8 @@
-import { Suspense, use } from "react";
+import { Suspense } from "react";
 import RenderWorks from "./RenderWorks";
 import LoadingPage from "@/components/LoadingPage";
+
+export const runtime = "edge";
 
 const Works: React.FC = async () => {
   return (

@@ -60,7 +60,7 @@ export default function Home() {
         : null}
       <div
         className={classNames(
-          "w-[512px] z-20 flex flex-1 items-center  justify-center"
+          "w-[512px] z-20 flex flex-1 items-center justify-center"
         )}
         style={
           layout && {

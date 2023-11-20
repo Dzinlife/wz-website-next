@@ -1,35 +1,54 @@
 "use client";
 
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useSpring } from "@/utils/useSpring";
 import { useTick } from "@/utils/useTick";
 import classNames from "classnames";
 
+type SelectProps<T> = T extends string
+  ? {
+      options: Array<string>;
+      labelProp?: never;
+      valueProp?: never;
+    }
+  : {
+      options: Array<T>;
+      labelProp: keyof T;
+      valueProp: keyof T;
+    };
+
+export const Select = <T extends unknown>(props: SelectProps<T>) => {
+  return <div>{JSON.stringify(props)}</div>;
+};
+
 const Magnification: React.FC<
-  PropsWithChildren<{
-    cellWidth?: number;
-    cellHeight?: number;
-    zoomRaduis?: number;
-    zoom?: number;
-    style?: React.CSSProperties;
-    cellStyle?: React.CSSProperties;
-    className?: string;
-    cellClassName?: string;
-    direction?: "horizontal" | "vertical";
-    origin?: "left" | "right" | "center" | "top" | "bottom";
-  }>
+  React.PropsWithChildren<
+    {
+      cellWidth?: number;
+      cellHeight?: number;
+      zoomRange?: number;
+      zoom?: number;
+      style?: React.CSSProperties;
+      cellStyle?: React.CSSProperties;
+      className?: string;
+      cellClassName?: string;
+    } & (
+      | {
+          direction?: "horizontal";
+          origin?: "center" | "left" | "right";
+        }
+      | {
+          direction: "vertical";
+          origin?: "center" | "top" | "bottom";
+        }
+    )
+  >
 > = ({
   children,
   direction = "horizontal",
   cellWidth = 44,
   cellHeight = 44,
-  zoomRaduis = 1,
+  zoomRange = 2,
   zoom = 2,
   style,
   cellStyle,
@@ -40,6 +59,8 @@ const Magnification: React.FC<
   const n = React.Children.count(children);
 
   const calc = useMemo(() => {
+    const zoomRaduis = zoomRange / 2;
+
     const range = (i: number, offset: number) => {
       let left = i - offset;
       let right = left + 1;
@@ -90,7 +111,7 @@ const Magnification: React.FC<
       calcScales,
       calcScaleSum,
     };
-  }, [n, zoomRaduis]);
+  }, [n, zoomRange]);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -139,13 +160,27 @@ const Magnification: React.FC<
 
   const tick = useTick();
 
-  const mouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    mouseRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-    };
-    tick(update);
-  };
+  const mouseMove: React.MouseEventHandler<HTMLDivElement> = useCallback(
+    (e) => {
+      mouseRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+      };
+      tick(update);
+    },
+    [tick, update]
+  );
+
+  const touchMove: React.TouchEventHandler<HTMLDivElement> = useCallback(
+    (e) => {
+      mouseRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
+      tick(update);
+    },
+    [tick, update]
+  );
 
   const transitionSpring = useSpring<number>(
     scaleRef.current,
@@ -158,20 +193,23 @@ const Magnification: React.FC<
     [update]
   );
 
-  const mouseEnter = () => {
+  const mouseEnter = useCallback(() => {
     transitionSpring.transitionTo(zoom - 1);
-  };
+  }, [transitionSpring, zoom]);
 
-  const mouseLeave = () => {
+  const mouseLeave = useCallback(() => {
     transitionSpring.transitionTo(0);
-  };
+  }, [transitionSpring]);
 
   return (
     <div
       ref={containerRef}
       onMouseMove={mouseMove}
+      onTouchMove={touchMove}
       onMouseEnter={mouseEnter}
+      onTouchStart={mouseEnter}
       onMouseLeave={mouseLeave}
+      onTouchEnd={mouseLeave}
       style={{
         whiteSpace: "nowrap",
         ...style,
@@ -204,4 +242,4 @@ const Magnification: React.FC<
   );
 };
 
-export default Magnification;
+export default React.memo(Magnification);

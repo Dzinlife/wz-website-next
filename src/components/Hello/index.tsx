@@ -3,7 +3,7 @@ import { useLayout } from "@/utils/useLayout";
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useEffect, useMemo, useRef, useState } from "react";
+import React, { use, useEffect, useMemo, useRef, useState } from "react";
 
 const Hello: React.FC = () => {
   const { minWidth, layout } = useLayout();
@@ -58,6 +58,8 @@ const Hello: React.FC = () => {
   }, [colors, updateKey]);
 
   useEffect(() => {
+    update({});
+
     const timer = setInterval(() => {
       update({});
     }, 2000);
@@ -166,7 +168,7 @@ const Hello: React.FC = () => {
             </span>
           </div>
           <div>
-            <span className="use-color-blend text-[32em]">Free free to</span>
+            <span className="use-color-blend text-[32em]">Feel free to</span>
 
             <Link href="/contact">
               <span style={{ fontSize: "65em", lineHeight: "1.3em" }}>
@@ -192,4 +194,4 @@ const Hello: React.FC = () => {
   );
 };
 
-export default Hello;
+export default React.memo(Hello);
