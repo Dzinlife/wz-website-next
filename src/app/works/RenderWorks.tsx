@@ -8,27 +8,39 @@ const Works: React.FC = async () => {
 
   if (!pages) return notFound();
 
+  const item = (post: any) => {
+    return (
+      <>
+        <div className="transition-opacity text-lg leading-8 font-bold font-[Mark] group-hover:opacity-100">
+          {post.properties.Title.title[0].plain_text}
+        </div>
+        <div className="bg-gray-100">
+          <LoadingImage
+            src={post.properties.Banner.files[0]?.file.url}
+            width={800}
+            height={400}
+            alt={post.properties.Title.title[0].plain_text}
+          />
+        </div>
+      </>
+    );
+  };
+
   return (
     <>
       {pages.results.map((post: any) => {
         return (
           <div key={post.id} className="group mb-[12%]">
-            <Link
-              href={`/works/${post.properties.Slug.rich_text[0].plain_text}`}
-              scroll={false}
-            >
-              <div className="transition-opacity text-lg leading-8 font-bold font-[Mark] group-hover:opacity-100">
-                {post.properties.Title.title[0].plain_text}
-              </div>
-              <div className="bg-gray-100">
-                <LoadingImage
-                  src={post.properties.Banner.files[0]?.file.url}
-                  width={800}
-                  height={400}
-                  alt={post.properties.Title.title[0].plain_text}
-                />
-              </div>
-            </Link>
+            {post.properties.Slug.rich_text[0]?.plain_text ? (
+              <Link
+                href={`/works/${post.properties.Slug.rich_text[0]?.plain_text}`}
+                scroll={false}
+              >
+                {item(post)}
+              </Link>
+            ) : (
+              item(post)
+            )}
           </div>
         );
       })}

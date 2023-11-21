@@ -106,17 +106,6 @@ export default function ClientLayout({
   return (
     <>
       <Header />
-      <div className="hidden">
-        <Link href="/" prefetch={true}>
-          About
-        </Link>
-        <Link href="/works" prefetch={true}>
-          Works
-        </Link>
-        <Link href="/contact" prefetch={true}>
-          Contact
-        </Link>
-      </div>
       <div
         className={classNames("flex-1 pb-20", {
           "pt-[40px]": layout === "landscape",

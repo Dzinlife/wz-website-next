@@ -4,6 +4,9 @@ import LoadingPage from "@/components/LoadingPage";
 
 export const runtime = "edge";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const Works: React.FC = async () => {
   return (
     <div className="max-w-[800px] px-8 box-content mx-auto">

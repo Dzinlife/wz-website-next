@@ -3,6 +3,8 @@
 import Magnification from "@/components/Magnification";
 import { useLayout } from "@/utils/useLayout";
 
+export const dynamic = "force-static";
+
 const Twitter: React.FC = () => {
   return (
     <svg width="37px" height="31px" viewBox="0 0 37 31">

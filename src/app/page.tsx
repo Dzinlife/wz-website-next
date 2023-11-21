@@ -1,6 +1,5 @@
 "use client";
 import ReactDOM from "react-dom";
-import me from "../assets/me.svg";
 import classNames from "classnames";
 import { useLayout } from "@/utils/useLayout";
 import Hello from "@/components/Hello";
@@ -27,6 +26,9 @@ const Me: React.FC<{ className?: string; style?: React.CSSProperties }> = ({
     </svg>
   );
 };
+
+export const dynamic = "force-static";
+export const revalidate = false;
 
 export default function Home() {
   const { layout, offsetLeft, minWidth, minHeight } = useLayout();
