@@ -8,6 +8,11 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Fall in Life",
   description: "Wz's website",
+  openGraph: {
+    title: "Fall in Life",
+    description: "Wz's website",
+    images: "https://fallinlife.com/icon.png",
+  },
 };
 
 export const viewport: Viewport = {
