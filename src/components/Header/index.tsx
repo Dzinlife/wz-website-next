@@ -22,7 +22,6 @@ import Wz from "./Wz";
 import classNames from "classnames";
 
 const Header: React.FC = () => {
-  const dotSeaRef = useRef<ReturnType<typeof createDotSea>>(null!);
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
   const route = useSelectedLayoutSegment();
   const routes = useSelectedLayoutSegments();
@@ -63,29 +62,17 @@ const Header: React.FC = () => {
 
   const { layout, offsetLeft, minWidth } = useLayout(curveLength);
 
-  const [headerColor, setHeaderColor] = useState<"white" | "black">("white");
-
-  // const [headerColor, setHeaderColor] = useState<"white" | "black">(
-  //   layout === "portrait" && !route ? "white" : "black"
-  // );
-
-  // useEffect(() => {
-  //   // const color = layout === "portrait" && !route ? "white" : "black";
-  //   const color = "white";
-  //   setHeaderColor(color);
-
-  //   dotSeaRef.current?.setColor(color);
-  // }, [layout, route]);
-
-  useEffect(() => {
-    dotSeaRef.current = createDotSea({
-      color: headerColor,
-
+  const { data: dotSea } = useAsyncMemo(() => {
+    return createDotSea({
+      color: "white",
       width: window.innerWidth,
     });
-    const { renderer, destroy, getCurve, setWidth, onUpdate } =
-      dotSeaRef.current;
+  }, []);
 
+  useEffect(() => {
+    if (!dotSea) return;
+
+    const { renderer, destroy, getCurve, setWidth, onUpdate } = dotSea;
     onUpdate(() => setCurve(getCurve()));
 
     const resizeHandler = () => {
@@ -105,7 +92,7 @@ const Header: React.FC = () => {
       window.removeEventListener("resize", resizeHandler);
       destroy();
     };
-  }, [headerColor]);
+  }, [dotSea]);
 
   const tabs = useMemo(
     () => [
@@ -357,11 +344,6 @@ const Header: React.FC = () => {
 
   const router = useRouter();
 
-  const wzColor = useMemo(() => {
-    if (!route && layout === "landscape") return "white";
-    return headerColor;
-  }, [route, headerColor, layout]);
-
   const [, startTransition] = useTransition();
 
   const [isTop, setIsTop] = useState(true);
@@ -390,7 +372,7 @@ const Header: React.FC = () => {
     >
       <div ref={canvasWrapperRef}></div>
       <Wz
-        color={wzColor}
+        color={"white"}
         height={28}
         className={classNames("z-10", {
           hidden: !layout,
@@ -421,7 +403,7 @@ const Header: React.FC = () => {
           d={underlineCurvePath}
           fill="transparent"
           strokeWidth="2"
-          stroke={headerColor}
+          stroke={"white"}
         />
         {tabsWithOffset?.map((tab, i) => (
           <g
@@ -442,7 +424,7 @@ const Header: React.FC = () => {
               transform={`translate(${rectOffset?.[i] ?? 0})`}
             />
             <text
-              fill={headerColor}
+              fill={"white"}
               textAnchor="middle"
               className={classNames("transition-all ", {
                 "group-hover:text-[16px]":

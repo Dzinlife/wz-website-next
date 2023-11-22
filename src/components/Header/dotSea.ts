@@ -1,7 +1,32 @@
 import * as Three from "three";
-import dotImg from "./dot.png";
 
-export const createDotSea = (option: {
+const createDotTexture = async () => {
+  const canvas = document.createElement("canvas");
+  canvas.width = 16;
+  canvas.height = 16;
+
+  const ctx = canvas.getContext("2d")!;
+
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const radius = canvas.width / 2;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+  ctx.fill();
+  ctx.closePath();
+
+  return await new Promise<string>((resolve) => {
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob!);
+
+      resolve(url);
+    });
+  });
+};
+
+export const createDotSea = async (option: {
   fov?: number;
   separation?: number;
   color: "black" | "white";
@@ -37,7 +62,7 @@ export const createDotSea = (option: {
 
   scene.fog = new Three.Fog(0x000000, 1000, 2800);
 
-  const texture = new Three.TextureLoader().load(dotImg.src);
+  const texture = new Three.TextureLoader().load(await createDotTexture());
 
   const material = new Three.SpriteMaterial({
     map: texture,
