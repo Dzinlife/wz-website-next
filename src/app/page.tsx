@@ -5,6 +5,7 @@ import { useLayout } from "@/utils/useLayout";
 import Hello from "@/components/Hello";
 import { CSSTransition } from "react-transition-group";
 import { usePathname } from "next/navigation";
+import { PAGE_TRANSITION_DURATION } from "@/constants";
 
 const Me: React.FC<{ className?: string; style?: React.CSSProperties }> = ({
   className,
@@ -43,7 +44,10 @@ export default function Home() {
               in={pathname === "/"}
               appear
               exit={true}
-              timeout={400}
+              addEndListener={(node, done) => {
+                node.addEventListener("transitionend", done, false);
+              }}
+              timeout={PAGE_TRANSITION_DURATION / 2}
               classNames="page-transition"
               mountOnEnter
               unmountOnExit

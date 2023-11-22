@@ -20,6 +20,7 @@ import { useSpring } from "@/utils/useSpring";
 import { useLayout } from "@/utils/useLayout";
 import Wz from "./Wz";
 import classNames from "classnames";
+import { PAGE_TRANSITION_DURATION } from "@/constants";
 
 const Header: React.FC = () => {
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
@@ -212,7 +213,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPrevRouteIndex(routeIndex);
-    }, 500);
+    }, PAGE_TRANSITION_DURATION);
 
     return () => {
       setPrevRouteIndex(routeIndex);

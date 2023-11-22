@@ -15,6 +15,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { LayoutRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useLayout } from "@/utils/useLayout";
 import classNames from "classnames";
+import { PAGE_TRANSITION_DURATION } from "@/constants";
 
 const FrozenRouter: React.FC<React.PropsWithChildren> = (props) => {
   const context = useContext(LayoutRouterContext);
@@ -34,8 +35,6 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const duration = 300;
-
   const { layout } = useLayout();
 
   const pathname = usePathname();
@@ -131,7 +130,7 @@ export default function ClientLayout({
           .page-transition-appear-active {
             opacity: 1;
             transform: translate3d(0, 0, 0);
-            transition: ${duration}ms ease;
+            transition: ${PAGE_TRANSITION_DURATION / 2}ms ease;
           }
           .page-transition-enter {
             opacity: 0;
@@ -145,12 +144,12 @@ export default function ClientLayout({
           .page-transition-enter-active {
             opacity: 1;
             transform: translate3d(0, 0, 0);
-            transition: ${duration}ms ease;
+            transition: ${PAGE_TRANSITION_DURATION / 2}ms ease;
           }
           .page-transition-exit {
             opacity: 1;
             transform: translate3d(0, 0, 0);
-            transition: ${duration}ms ease-in;
+            transition: ${PAGE_TRANSITION_DURATION / 2}ms ease-in;
           }
 
           .page-transition-exit-active {
@@ -191,7 +190,7 @@ export default function ClientLayout({
 
                 node.addEventListener("transitionend", done, false);
               }}
-              timeout={duration}
+              // timeout={PAGE_TRANSITION_DURATION / 2}
               classNames="page-transition"
               key={pathname}
             >

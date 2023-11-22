@@ -4,6 +4,7 @@ import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { use, useEffect, useMemo, useRef, useState } from "react";
+import { PAGE_TRANSITION_DURATION } from "@/constants";
 
 const Hello: React.FC = () => {
   const { minWidth, layout } = useLayout();
@@ -87,7 +88,7 @@ const Hello: React.FC = () => {
         .onUpdate((value) => {
           setHelloOpacity(value ?? 0);
         });
-    }, 400);
+    }, PAGE_TRANSITION_DURATION / 2);
 
     return () => {
       helloSpring.destroy();
