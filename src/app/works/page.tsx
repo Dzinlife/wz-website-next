@@ -4,8 +4,7 @@ import LoadingPage from "@/components/LoadingPage";
 
 export const runtime = "edge";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 300;
 
 const Works: React.FC = async () => {
   return (
