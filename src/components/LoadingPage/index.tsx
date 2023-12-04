@@ -7,7 +7,7 @@ import React from "react";
 const LoadingPage: React.FC = () => {
   return (
     <div style={{ height: 464 }} className="flex items-center justify-center">
-      <Image src={spin} alt="" />
+      <Image src={spin} alt="" priority />
     </div>
   );
 };

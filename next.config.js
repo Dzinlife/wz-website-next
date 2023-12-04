@@ -11,6 +11,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
           hostname: '*',
         },
       ],
+      unoptimized: true
     }
   })
   

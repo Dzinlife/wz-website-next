@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import spin from "@/assets/ring-resize.svg";
 import Image from "next/image";
 import classNames from "classnames";
-import { useLayout } from "@/utils/useLayout";
 
 const LoadingImage: React.FC<{
   src: string;
@@ -22,6 +21,7 @@ const LoadingImage: React.FC<{
           src={spin}
           alt=""
           className="absolute inset-0 m-auto inline-block transition-opacity"
+          priority
         />
       )}
       <Image
@@ -38,6 +38,7 @@ const LoadingImage: React.FC<{
         onError={() => {
           location.reload();
         }}
+        priority
       />
     </div>
   );

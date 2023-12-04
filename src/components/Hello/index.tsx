@@ -56,6 +56,7 @@ const Hello: React.FC = () => {
     }
 
     return picked;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [colors, updateKey]);
 
   useEffect(() => {
@@ -94,6 +95,7 @@ const Hello: React.FC = () => {
       helloSpring.destroy();
       clearTimeout(timer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layout]);
 
   return (

@@ -46,6 +46,7 @@ export const useTick = (deps: DependencyList = []) => {
         innerCallbacks.length = 0;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps]);
 
   return tick;

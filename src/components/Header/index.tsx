@@ -21,11 +21,21 @@ import { useLayout } from "@/utils/useLayout";
 import Wz from "./Wz";
 import classNames from "classnames";
 import { PAGE_TRANSITION_DURATION } from "@/constants";
+import { PrefetchKind } from "next/dist/client/components/router-reducer/router-reducer-types";
 
 const Header: React.FC = () => {
   const canvasWrapperRef = useRef<HTMLDivElement>(null);
   const route = useSelectedLayoutSegment();
   const routes = useSelectedLayoutSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch("/");
+    router.prefetch("/works", {
+      kind: PrefetchKind.FULL,
+    });
+    router.prefetch("/contact");
+  }, [router]);
 
   const [curve, setCurve] = useState<[number, number][]>([]);
 
@@ -342,8 +352,6 @@ const Header: React.FC = () => {
   }, [curve, getPathPropByCurve, splitCurve, springLeft, springRight]);
 
   const svgPathId = useId();
-
-  const router = useRouter();
 
   const [, startTransition] = useTransition();
 
