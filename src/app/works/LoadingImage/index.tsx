@@ -36,7 +36,16 @@ const LoadingImage: React.FC<{
           setIsImageReady(true);
         }}
         onError={() => {
-          location.reload();
+          fetch(src)
+            .then(async (res) => {
+              if (res.status === 403) {
+                location.reload();
+              }
+              setIsImageReady(true);
+            })
+            .catch(() => {
+              setIsImageReady(true);
+            });
         }}
         priority
       />
