@@ -46,9 +46,16 @@ const Spring = <
   let raf: number;
   let lastTime = 0;
 
-  const interpolate = () => {
+  const animate = () => {
     const now = performance.now();
-    const secPerFrame = (now - lastTime) / 1000;
+    let secPerFrame = (now - lastTime) / 1000;
+
+    // 页面切换到后台，requestAnimationFrame 会暂停，导致 secPerFrame 过大
+    if (secPerFrame > 0.1) {
+      lastTime = now;
+      raf = requestAnimationFrame(animate);
+      return;
+    }
 
     const { stiffness, damping, precision } = config;
 
@@ -79,7 +86,7 @@ const Spring = <
 
     if (motionList.some((n) => !n.isComplete)) {
       lastTime = performance.now();
-      raf = requestAnimationFrame(interpolate);
+      raf = requestAnimationFrame(animate);
     } else config.onRest(positions as V);
   };
 
@@ -108,8 +115,7 @@ const Spring = <
         v !== undefined ? (Array.isArray(v) ? v.slice() : [v]) : [];
 
       if (endPositions.some((n, i) => n !== positions[i])) {
-        lastTime = performance.now();
-        raf = requestAnimationFrame(interpolate);
+        animate();
       }
 
       return instance;
