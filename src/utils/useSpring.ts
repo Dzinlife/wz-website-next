@@ -40,12 +40,16 @@ const Spring = <
         : [initialPosition]
       : [];
   let endPositions: number[] = [];
-  let secPerFrame = 1 / 60;
+  // let secPerFrame = 1 / 60;
   let velocity = 0;
   let motionList = [];
   let raf: number;
+  let lastTime = 0;
 
   const interpolate = () => {
+    const now = performance.now();
+    const secPerFrame = (now - lastTime) / 1000;
+
     const { stiffness, damping, precision } = config;
 
     motionList = endPositions.map((endPosition, i) => {
@@ -73,9 +77,10 @@ const Spring = <
 
     config.onUpdate(positions as V);
 
-    if (motionList.some((n) => !n.isComplete))
+    if (motionList.some((n) => !n.isComplete)) {
+      lastTime = performance.now();
       raf = requestAnimationFrame(interpolate);
-    else config.onRest(positions as V);
+    } else config.onRest(positions as V);
   };
 
   const instance = {
@@ -103,6 +108,7 @@ const Spring = <
         v !== undefined ? (Array.isArray(v) ? v.slice() : [v]) : [];
 
       if (endPositions.some((n, i) => n !== positions[i])) {
+        lastTime = performance.now();
         raf = requestAnimationFrame(interpolate);
       }
 

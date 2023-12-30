@@ -141,16 +141,16 @@ export const createDotSea = async (option: {
     return curveArray;
   };
 
-  let tick = 0;
-
   const render = () => {
+    const now = performance.now();
+
     let renderIndex = 0;
     for (let ix = 0; ix < meta.amountX; ix += 1) {
       for (let iy = 0; iy < meta.amountY; iy += 1) {
         const particle = particles[renderIndex];
 
-        const waveX = Math.sin((ix + tick / 10) * 0.3);
-        const waveY = Math.sin((iy + tick / 10) * 0.5);
+        const waveX = Math.sin((ix + now / 160) * 0.3);
+        const waveY = Math.sin((iy + now / 160) * 0.5);
 
         particle.position.y = (waveX + waveY) * 50;
 
@@ -164,7 +164,6 @@ export const createDotSea = async (option: {
     }
 
     renderer.render(scene, camera);
-    tick += 1;
   };
 
   let requestId: number;
@@ -177,7 +176,7 @@ export const createDotSea = async (option: {
     requestId = requestAnimationFrame(animate);
   };
 
-  animate();
+  requestAnimationFrame(animate);
 
   const onUpdate = (callback: Function) => {
     callbacks.push(callback);
