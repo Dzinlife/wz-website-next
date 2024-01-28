@@ -6,12 +6,20 @@ import { Inter } from "next/font/google";
 import Link from "next/link";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://fallinlife.com"),
   title: "Fall in Life",
   description: "Wz's website",
   openGraph: {
     title: "Fall in Life",
     description: "Wz's website",
-    images: "https://fallinlife.com/icon.png",
+    images: "/icon.png",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@dzinlife",
+    title: "Fall in Life",
+    description: "Wz's website",
+    images: "/icon.png",
   },
 };
 
