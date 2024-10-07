@@ -52,14 +52,14 @@ export default function Home() {
               mountOnEnter
               unmountOnExit
             >
-              <Me
-                className={classNames(
-                  "sticky bottom-0 top-0 pointer-events-none -z-10 h-[100vh] mt-[-100vh]"
-                )}
-                style={{
-                  inlineSize: "100vh",
-                }}
-              />
+              <div className="w-full h-screen mt-[-100vh] overflow-clip sticky bottom-0 top-0 pointer-events-none -z-10 ">
+                <Me
+                  className="h-full"
+                  style={{
+                    inlineSize: "100vh",
+                  }}
+                />
+              </div>
             </CSSTransition>,
             document.body
           )
